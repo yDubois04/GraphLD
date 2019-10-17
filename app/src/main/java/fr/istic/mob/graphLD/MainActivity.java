@@ -15,6 +15,9 @@ public class MainActivity extends AppCompatActivity {
     private DrawableGraph drawableGraph;
     private Graph graph;
     ImageView imageView;
+    private boolean nodeMode;
+    private boolean arcMode;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -26,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
         drawableGraph = new DrawableGraph(graph);
         imageView = findViewById(R.id.imageView);
         imageView.setImageDrawable(drawableGraph);
+        nodeMode = true;
+        arcMode = false;
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -44,15 +49,15 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if ( action == MotionEvent.ACTION_MOVE && touchNode != null) {
-                    touchNode.setCoordX((int)x);
-                    touchNode.setCoordY((int)y);
+                    touchNode.setCoordX(x);
+                    touchNode.setCoordY(y);
                     drawableGraph = new DrawableGraph(graph);
                     imageView.setImageDrawable(drawableGraph);
                 }
 
                 if ( action == MotionEvent.ACTION_UP && touchNode != null) {
-                    touchNode.setCoordX((int)x);
-                    touchNode.setCoordY((int)y);
+                    touchNode.setCoordX(x);
+                    touchNode.setCoordY(y);
                     drawableGraph = new DrawableGraph(graph);
                     imageView.setImageDrawable(drawableGraph);
                 }

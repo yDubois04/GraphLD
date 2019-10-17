@@ -27,7 +27,6 @@ public class DrawableGraph extends Drawable {
         for (Node noeud : graph.getNodes()) {
             canvas.drawRoundRect(noeud.getCoordX(), noeud.getCoordY(), noeud.getCoordX()+nodeSize, noeud.getCoordY()+nodeSize,50,50,p);
         }
-
     }
 
     @Override
