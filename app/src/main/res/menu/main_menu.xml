@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/resetButton"
+        android:title="@string/reset_button" />
+    <item
+        android:id="@+id/delButton"
+        android:title="@string/delete_button" />
+    <item
+        android:id="@+id/addNodeButton"
+        android:title="@string/add_node_button" />
+    <item
+        android:id="@+id/addArcButton"
+        android:title="@string/add_arc_button" />
+</menu>
