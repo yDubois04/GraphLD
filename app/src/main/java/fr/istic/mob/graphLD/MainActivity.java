@@ -15,9 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawableGraph drawableGraph;
     private Graph graph;
     ImageView imageView;
-    private boolean nodeMode;
-    private boolean arcMode;
-
+    Modes mode;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -29,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
         drawableGraph = new DrawableGraph(graph);
         imageView = findViewById(R.id.imageView);
         imageView.setImageDrawable(drawableGraph);
-        nodeMode = true;
-        arcMode = false;
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -41,27 +37,28 @@ public class MainActivity extends AppCompatActivity {
 
                 Node touchNode = findTouchNode (x,y);
 
-                if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
-                    touchNode.setCoordX((int)x);
-                    touchNode.setCoordY((int)y);
-                    drawableGraph = new DrawableGraph(graph);
-                    imageView.setImageDrawable(drawableGraph);
-                }
+                if (mode == Modes.NodeMode) {
+                    if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
+                        touchNode.setCoordX(x);
+                        touchNode.setCoordY(y);
+                        drawableGraph = new DrawableGraph(graph);
+                        imageView.setImageDrawable(drawableGraph);
+                    }
 
-                if ( action == MotionEvent.ACTION_MOVE && touchNode != null) {
-                    touchNode.setCoordX(x);
-                    touchNode.setCoordY(y);
-                    drawableGraph = new DrawableGraph(graph);
-                    imageView.setImageDrawable(drawableGraph);
-                }
+                    if ( action == MotionEvent.ACTION_MOVE && touchNode != null) {
+                        touchNode.setCoordX(x);
+                        touchNode.setCoordY(y);
+                        drawableGraph = new DrawableGraph(graph);
+                        imageView.setImageDrawable(drawableGraph);
+                    }
 
-                if ( action == MotionEvent.ACTION_UP && touchNode != null) {
-                    touchNode.setCoordX(x);
-                    touchNode.setCoordY(y);
-                    drawableGraph = new DrawableGraph(graph);
-                    imageView.setImageDrawable(drawableGraph);
+                    if ( action == MotionEvent.ACTION_UP && touchNode != null) {
+                        touchNode.setCoordX(x);
+                        touchNode.setCoordY(y);
+                        drawableGraph = new DrawableGraph(graph);
+                        imageView.setImageDrawable(drawableGraph);
+                    }
                 }
-
                 return true;
             }
         });
@@ -79,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initialiserGraph () {
+        this.mode = Modes.NodeMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
             graph.getNodes().add(new Node(120f*i, 0, "noir","noeud"+i));
