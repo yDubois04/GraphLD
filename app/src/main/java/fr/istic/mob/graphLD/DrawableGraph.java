@@ -14,10 +14,11 @@ import androidx.annotation.RequiresApi;
 public class DrawableGraph extends Drawable {
 
     private Graph graph;
-    final int nodeSize = 100;
+    private int nodeSize;
 
-    public DrawableGraph(Graph graph) {
+    public DrawableGraph(Graph graph, int newNodeSize) {
         this.graph = graph;
+        nodeSize = newNodeSize;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -25,7 +26,7 @@ public class DrawableGraph extends Drawable {
     public void draw(@NonNull Canvas canvas) {
         Paint p = new Paint();
         for (Node noeud : graph.getNodes()) {
-            canvas.drawRoundRect(noeud.getCoordX(), noeud.getCoordY(), noeud.getCoordX()+nodeSize, noeud.getCoordY()+nodeSize,50,50,p);
+            canvas.drawRoundRect(noeud.getCoordX()-50, noeud.getCoordY()-50, noeud.getCoordX()+nodeSize/2, noeud.getCoordY()+nodeSize/2,50,50,p);
         }
     }
 

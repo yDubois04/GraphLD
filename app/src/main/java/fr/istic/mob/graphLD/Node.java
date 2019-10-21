@@ -8,13 +8,16 @@ public class Node extends RectF {
     private float coordY;
     private String couleur;
     private String label;
+    private int nodeSize;
 
-    public Node(float coordX, float coordY, String couleur, String label) {
-        super(coordX,coordY,coordX+100,coordY+100);
+    public Node(float coordX, float coordY, String couleur, String label, int newNodeSize) {
+        super(coordX-newNodeSize/2,coordY-newNodeSize/2,coordX+newNodeSize/2,coordY+newNodeSize/2);
         this.coordX = coordX;
         this.coordY = coordY;
         this.couleur = couleur;
         this.label = label;
+
+        nodeSize = newNodeSize;
     }
 
     public float getCoordX() {
@@ -22,7 +25,7 @@ public class Node extends RectF {
     }
 
     public void setCoordX(float coordX) {
-        super.set(coordX-50,this.coordY-50, coordX+50, this.coordY+50);
+        super.set(coordX-nodeSize/2,this.coordY-nodeSize/2, coordX+nodeSize/2, this.coordY+nodeSize/2);
         this.coordX = coordX;
     }
 
@@ -31,7 +34,7 @@ public class Node extends RectF {
     }
 
     public void setCoordY(float coordY) {
-        super.set(this.coordX-50,coordY-50, this.coordX+50, coordY+50);
+        super.set(this.coordX-nodeSize/2,coordY-nodeSize/2, this.coordX+nodeSize/2, coordY+nodeSize/2);
         this.coordY = coordY;
     }
 
