@@ -1,11 +1,14 @@
 package fr.istic.mob.graphLD;
 
-public class Arc {
+import android.graphics.Path;
+
+public class Arc extends Path {
 
     private Node node1;
     private Node node2;
 
     public Arc (Node node1, Node node2) {
+        super ();
         this.node1 = node1;
         this.node2 = node2;
     }

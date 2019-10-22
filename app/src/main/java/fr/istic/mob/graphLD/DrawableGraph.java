@@ -28,6 +28,12 @@ public class DrawableGraph extends Drawable {
         for (Node noeud : graph.getNodes()) {
             canvas.drawRoundRect(noeud.getCoordX()-50, noeud.getCoordY()-50, noeud.getCoordX()+nodeSize/2, noeud.getCoordY()+nodeSize/2,50,50,p);
         }
+
+        for (Arc arc : graph.getArcs()) {
+            Node node1 = arc.getNode1();
+            Node node2 = arc.getNode2();
+            canvas.drawLine(node1.getCoordX(),node1.getCoordY(),node2.getCoordX(),node2.getCoordY(),p);
+        }
     }
 
     @Override

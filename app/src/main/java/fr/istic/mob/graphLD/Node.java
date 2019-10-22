@@ -7,16 +7,13 @@ public class Node extends RectF {
     private float coordX;
     private float coordY;
     private String couleur;
-    private String label;
     private int nodeSize;
 
-    public Node(float coordX, float coordY, String couleur, String label, int newNodeSize) {
+    public Node(float coordX, float coordY, String couleur, int newNodeSize) {
         super(coordX-newNodeSize/2,coordY-newNodeSize/2,coordX+newNodeSize/2,coordY+newNodeSize/2);
         this.coordX = coordX;
         this.coordY = coordY;
         this.couleur = couleur;
-        this.label = label;
-
         nodeSize = newNodeSize;
     }
 
@@ -44,13 +41,5 @@ public class Node extends RectF {
 
     public void setCouleur(String couleur) {
         this.couleur = couleur;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 }
