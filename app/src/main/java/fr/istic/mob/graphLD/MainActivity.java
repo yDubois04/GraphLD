@@ -39,21 +39,18 @@ public class MainActivity extends AppCompatActivity {
                 Node touchNode = findTouchNode (x,y);
 
                 if (mode == Modes.NodeMode && touchNode != null) {
-                    if (action == MotionEvent.ACTION_DOWN) {
+                    if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP) {
                         touchNode.setCoordX(x);
                         touchNode.setCoordY(y);
-                        update();
-                    }
-
-                    if ( action == MotionEvent.ACTION_MOVE) {
-                        touchNode.setCoordX(x);
-                        touchNode.setCoordY(y);
-                        update ();
-                    }
-
-                    if ( action == MotionEvent.ACTION_UP) {
-                        touchNode.setCoordX(x);
-                        touchNode.setCoordY(y);
+                        for (Arc arc : graph.getArcs()) {
+                            if(arc.getNode1() == touchNode || arc.getNode2() == touchNode){
+                                arc.reset();
+                                Node node1 = arc.getNode1();
+                                Node node2 = arc.getNode2();
+                                arc.moveTo(node1.getCoordX(), node1.getCoordY());
+                                arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                            }
+                        }
                         update();
                     }
                 }

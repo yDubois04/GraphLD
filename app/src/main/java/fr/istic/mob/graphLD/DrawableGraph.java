@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,9 +31,15 @@ public class DrawableGraph extends Drawable {
         }
 
         for (Arc arc : graph.getArcs()) {
-            Node node1 = arc.getNode1();
-            Node node2 = arc.getNode2();
-            canvas.drawLine(node1.getCoordX(),node1.getCoordY(),node2.getCoordX(),node2.getCoordY(),p);
+            //arc.reset();
+            //Node node1 = arc.getNode1();
+            //Node node2 = arc.getNode2();
+            p.setStyle(Paint.Style.STROKE);
+            //arc.moveTo(node1.getCoordX(), node1.getCoordY());
+            //arc.lineTo(node2.getCoordX(), node2.getCoordY());
+            //canvas.drawLine(node1.getCoordX(),node1.getCoordY(),node2.getCoordX(),node2.getCoordY(),p);
+
+            canvas.drawPath(arc, p);
         }
     }
 
