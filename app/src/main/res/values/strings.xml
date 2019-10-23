@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">GraphLD</string>
-    <string name="reset_button">Reset</string>
-    <string name="delete_button">Delete</string>
-    <string name="add_node_button"> Ajouter Noeud</string>
+    <string name="reset_button">Reinitialiser</string>
+    <string name="delete_button">Supprimer</string>
+    <string name="add_node_button">Mode Ajouter Noeud</string>
     <string name="mode_arc_button">Mode Arc</string>
-    <string name="mode_node_button">Mode Noeud</string>
+    <string name="edition_mode_button">Mode Edition</string>
 </resources>

@@ -9,8 +9,8 @@ public class Graph {
     private List<Arc> arcs;
 
     public Graph () {
-        nodes = new ArrayList<Node>();
-        arcs = new ArrayList<Arc>();
+        nodes = new ArrayList <Node>();
+        arcs = new ArrayList <Arc>();
     }
 
     public void addNode (Node node) {
@@ -27,6 +27,10 @@ public class Graph {
 
     public List<Arc> getArcs () {
         return arcs;
+    }
+
+    public void removeArc (Arc arc) {
+        arcs.remove(arc);
     }
 
 }
