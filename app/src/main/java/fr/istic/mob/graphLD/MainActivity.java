@@ -17,8 +17,13 @@ public class MainActivity extends AppCompatActivity {
     private DrawableGraph drawableGraph;
     private Graph graph;
     ImageView imageView;
+    int imageViewHeight, imageViewWidth;
     Modes mode;
-    private int nodeSize = 100;
+    private int nodeSize = 80;
+
+    Node initialNode = null;
+    Node nodeTMP = null;
+    Arc arc = null;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -26,8 +31,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        this.initialiserGraph();
+        imageView = findViewById(R.id.imageView);
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -55,19 +59,67 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-              /*  if (mode == Modes.ArcMode && touchNode != null) {
-                    Node nodeTMP = new Node (x,y,"noir",nodeSize);
-                    Arc arc = new Arc (touchNode,nodeTMP);
-                    graph.addArc(arc);
-                    update();
+                if (mode == Modes.ArcMode){
+                    if(action == MotionEvent.ACTION_DOWN && touchNode != null){
+                        initialNode = touchNode;
+                        nodeTMP = new Node(x, y, "noir", nodeSize);
+                        arc = new Arc(initialNode, nodeTMP);
+                        graph.addArc(arc);
 
-                }*/
+                        arc.reset();
+                        arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
+                        arc.lineTo(nodeTMP.getCoordX(), nodeTMP.getCoordY());
+
+                        update();
+                    }
+                    if(action == MotionEvent.ACTION_MOVE){
+                        if(nodeTMP != null) {
+                            nodeTMP.setCoordX(x);
+                            nodeTMP.setCoordY(y);
+
+                            arc.reset();
+                            arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
+                            arc.lineTo(nodeTMP.getCoordX(), nodeTMP.getCoordY());
+
+                            update();
+                        }
+                    }
+                    if(action == MotionEvent.ACTION_UP){
+                        if(touchNode != null && nodeTMP != touchNode){
+                            graph.removeArc(arc);
+                            arc = new Arc(initialNode, touchNode);
+                            graph.addArc(arc);
+
+                            arc.reset();
+                            arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
+                            arc.lineTo(touchNode.getCoordX(), touchNode.getCoordY());
+
+                            update();
+                        }
+                        else{
+                            graph.removeArc(arc);
+                            update();
+                        }
+                    }
+                }
+
                 return true;
+            }
+        });
+
+        imageView.post(new Runnable() {
+            @Override
+            public void run() {
+                imageViewWidth = imageView.getWidth();
+                imageViewHeight = imageView.getHeight();
+
+                initialiserGraph();
+                update();
             }
         });
     }
 
-    public Node findTouchNode (float coordX, float coordY) {
+        public Node findTouchNode (float coordX, float coordY) {
         Node n = null;
 
         for (Node node : graph.getNodes()) {
@@ -78,20 +130,12 @@ public class MainActivity extends AppCompatActivity {
         return n;
     }
 
-    private void initialiserGraph () { //Tout les noeuds n'apparaissent pas, a regler
+    private void initialiserGraph () {
         mode = Modes.NodeMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node((120f + nodeSize/2)*i, nodeSize/2, "noir", nodeSize));
+            graph.getNodes().add(new Node(imageViewWidth/10f * i + nodeSize/2f + 10, nodeSize/2f + 10, "noir", nodeSize));
         }
-
-        Arc arc1 = new Arc (graph.getNodes().get(1), graph.getNodes().get(2));
-        graph.addArc(arc1);
-
-
-        drawableGraph = new DrawableGraph(graph, nodeSize);
-        imageView = findViewById(R.id.imageView);
-        imageView.setImageDrawable(drawableGraph);
     }
 
     @Override
