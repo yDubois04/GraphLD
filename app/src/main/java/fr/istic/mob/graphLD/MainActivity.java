@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private int nodeSize = 100;
 
 
-    @SuppressLint("ClickableViewAccessibility") //???
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
