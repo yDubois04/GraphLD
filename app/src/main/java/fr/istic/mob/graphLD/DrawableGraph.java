@@ -6,7 +6,6 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,20 +25,13 @@ public class DrawableGraph extends Drawable {
     @Override
     public void draw(@NonNull Canvas canvas) {
         Paint p = new Paint();
-        for (Node noeud : graph.getNodes()) {
-            canvas.drawRoundRect(noeud.getCoordX()-50, noeud.getCoordY()-50, noeud.getCoordX()+nodeSize/2, noeud.getCoordY()+nodeSize/2,50,50,p);
+        for (Node node : graph.getNodes()) {
+            canvas.drawRoundRect(node.getCoordX()-50, node.getCoordY()-50, node.getCoordX()+nodeSize/2, node.getCoordY()+nodeSize/2,50,50,p);
         }
 
         for (Arc arc : graph.getArcs()) {
-            //arc.reset();
-            //Node node1 = arc.getNode1();
-            //Node node2 = arc.getNode2();
-            p.setStyle(Paint.Style.STROKE);
-            //arc.moveTo(node1.getCoordX(), node1.getCoordY());
-            //arc.lineTo(node2.getCoordX(), node2.getCoordY());
-            //canvas.drawLine(node1.getCoordX(),node1.getCoordY(),node2.getCoordX(),node2.getCoordY(),p);
-
-            canvas.drawPath(arc, p);
+            p.setStyle (Paint.Style.STROKE);
+            canvas.drawPath(arc,p);
         }
     }
 

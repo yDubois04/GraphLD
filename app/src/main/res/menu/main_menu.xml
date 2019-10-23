@@ -8,13 +8,13 @@
         android:id="@+id/delButton"
         android:title="@string/delete_button" />
     <item
-        android:id="@+id/addNodeButton"
+        android:id="@+id/addNodeModeButton"
         android:title="@string/add_node_button" />
     <item
         android:id="@+id/modeArcButton"
         android:title="@string/mode_arc_button" />
 
     <item
-        android:id="@+id/modeNodeButton"
-        android:title="@string/mode_node_button" />
+        android:id="@+id/modeEditButton"
+        android:title="@string/edition_mode_button" />
 </menu>

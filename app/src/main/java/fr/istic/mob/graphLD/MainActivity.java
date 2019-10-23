@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             graph = new Graph();
             update();
         }
-        else if(itemID == R.id.addNodeButton){
+        else if(itemID == R.id.addNodeModeButton){
             //Toast.makeText(getApplicationContext(),"NOEUD", Toast.LENGTH_SHORT).show();
             graph.addNode(new Node(300, 300, "blue", nodeSize));
             update();
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(getApplicationContext(),"ARC", Toast.LENGTH_SHORT).show();
             mode = Modes.ArcMode;
         }
-        else if(itemID == R.id.modeNodeButton){
+        else if(itemID == R.id.modeEditButton){
             mode = Modes.NodeMode;
         }
 
