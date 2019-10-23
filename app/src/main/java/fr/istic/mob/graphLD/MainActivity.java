@@ -18,10 +18,9 @@ public class MainActivity extends AppCompatActivity {
     private Graph graph;
     ImageView imageView;
     Modes mode;
-    private int nodeSize = 100;
+    private int nodeSize = 80;
 
-
-    @SuppressLint("ClickableViewAccessibility") //???
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,34 +36,34 @@ public class MainActivity extends AppCompatActivity {
                 float y = motionEvent.getY();
 
                 Node touchNode = findTouchNode (x,y);
+                Node currentNode = new Node (x,y, "noir",nodeSize);
 
-                if (mode == Modes.NodeMode && touchNode != null) {
-                    if (action == MotionEvent.ACTION_DOWN) {
+                if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null ) {
+                    if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP) {
                         touchNode.setCoordX(x);
                         touchNode.setCoordY(y);
-                        update();
-                    }
-
-                    if ( action == MotionEvent.ACTION_MOVE) {
-                        touchNode.setCoordX(x);
-                        touchNode.setCoordY(y);
-                        update ();
-                    }
-
-                    if ( action == MotionEvent.ACTION_UP) {
-                        touchNode.setCoordX(x);
-                        touchNode.setCoordY(y);
-                        update();
+                        for (Arc arc : graph.getArcs()) {
+                            if(arc.getNode1() == touchNode || arc.getNode2() == touchNode){
+                                arc.reset();
+                                Node node1 = arc.getNode1();
+                                Node node2 = arc.getNode2();
+                                arc.moveTo(node1.getCoordX(), node1.getCoordY());
+                                arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                            }
+                            update();
+                        }
                     }
                 }
 
-              /*  if (mode == Modes.ArcMode && touchNode != null) {
-                    Node nodeTMP = new Node (x,y,"noir",nodeSize);
-                    Arc arc = new Arc (touchNode,nodeTMP);
-                    graph.addArc(arc);
-                    update();
+                if (mode == Modes.ArcMode && touchNode != null) {
+                    Arc arc = new Arc(touchNode,currentNode);
 
-                }*/
+                    if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP) {
+                        arc.moveTo(touchNode.getCoordX(), touchNode.getCoordY());
+                        arc.lineTo(currentNode.getCoordX(),currentNode.getCoordY());
+                        graph.addArc(arc);
+                    }
+                }
                 return true;
             }
         });
@@ -85,12 +84,10 @@ public class MainActivity extends AppCompatActivity {
         mode = Modes.NodeMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node((120f + nodeSize/2)*i, nodeSize/2, "noir", nodeSize));
+            graph.getNodes().add(new Node(nodeSize/2,(90f + nodeSize/2)*i, "noir", nodeSize));
         }
-
-        Arc arc1 = new Arc (graph.getNodes().get(1), graph.getNodes().get(2));
-        graph.addArc(arc1);
-
+        Arc arc = new Arc(graph.getNodes().get(1),graph.getNodes().get(2));
+        graph.addArc(arc);
 
         drawableGraph = new DrawableGraph(graph, nodeSize);
         imageView = findViewById(R.id.imageView);
@@ -107,26 +104,22 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemID = item.getItemId();
         if(itemID == R.id.resetButton){
-            //Toast.makeText(getApplicationContext(),"RESET", Toast.LENGTH_SHORT).show();
             initialiserGraph();
             update();
         }
-        if(itemID == R.id.delButton){
-            //Toast.makeText(getApplicationContext(),"DELETE", Toast.LENGTH_SHORT).show();
+        if(itemID == R.id.delButton) {
             graph = new Graph();
             update();
         }
-        else if(itemID == R.id.addNodeButton){
-            //Toast.makeText(getApplicationContext(),"NOEUD", Toast.LENGTH_SHORT).show();
+        else if(itemID == R.id.addNodeModeButton){
             graph.addNode(new Node(300, 300, "blue", nodeSize));
             update();
             mode = Modes.NodeMode;
         }
         else if(itemID == R.id.modeArcButton){
-            //Toast.makeText(getApplicationContext(),"ARC", Toast.LENGTH_SHORT).show();
             mode = Modes.ArcMode;
         }
-        else if(itemID == R.id.modeNodeButton){
+        else if(itemID == R.id.modeEditButton){
             mode = Modes.NodeMode;
         }
 
