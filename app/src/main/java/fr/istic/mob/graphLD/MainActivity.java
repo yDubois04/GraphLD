@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageView = findViewById(R.id.imageView);
+        imageView = (ImageView) findViewById(R.id.imageView);
+        registerForContextMenu(imageView);
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -40,30 +43,32 @@ public class MainActivity extends AppCompatActivity {
                 float x = motionEvent.getX();
                 float y = motionEvent.getY();
 
-                Node touchNode = findTouchNode (x,y);
+                Node touchNode = findTouchNode(x, y);
 
-                if (mode == Modes.NodeMode && touchNode != null) {
+                if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
                     if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP) {
-                        touchNode.setCoordX(x);
-                        touchNode.setCoordY(y);
-                        for (Arc arc : graph.getArcs()) {
-                            if(arc.getNode1() == touchNode || arc.getNode2() == touchNode){
-                                arc.reset();
-                                Node node1 = arc.getNode1();
-                                Node node2 = arc.getNode2();
-                                arc.moveTo(node1.getCoordX(), node1.getCoordY());
-                                arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                        if ((x < imageViewWidth-nodeSize/2 && y <imageViewHeight-nodeSize/2) && (x > nodeSize/2 && y >nodeSize/2)) {
+                            touchNode.setCoordX(x);
+                            touchNode.setCoordY(y);
+                            for (Arc arc : graph.getArcs()) {
+                                if (arc.getNode1() == touchNode || arc.getNode2() == touchNode) {
+                                    arc.reset();
+                                    Node node1 = arc.getNode1();
+                                    Node node2 = arc.getNode2();
+                                    arc.moveTo(node1.getCoordX(), node1.getCoordY());
+                                    arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                                }
                             }
+                            update();
                         }
-                        update();
                     }
                 }
 
-                if (mode == Modes.ArcMode){
-                    if(action == MotionEvent.ACTION_DOWN && touchNode != null){
+                if (mode == Modes.ArcMode) {
+                    if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
                         nodeTMP = new Node(x, y, "noir", nodeSize);
-                        arc = new Arc(initialNode, nodeTMP);
+                        arc = new Arc(initialNode, nodeTMP, "");
                         graph.addArc(arc);
 
                         arc.reset();
@@ -72,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
                         update();
                     }
-                    if(action == MotionEvent.ACTION_MOVE){
-                        if(nodeTMP != null) {
+                    if (action == MotionEvent.ACTION_MOVE) {
+                        if (nodeTMP != null) {
                             nodeTMP.setCoordX(x);
                             nodeTMP.setCoordY(y);
 
@@ -84,10 +89,10 @@ public class MainActivity extends AppCompatActivity {
                             update();
                         }
                     }
-                    if(action == MotionEvent.ACTION_UP){
-                        if(touchNode != null && nodeTMP != touchNode){
+                    if (action == MotionEvent.ACTION_UP) {
+                        if (touchNode != null && nodeTMP != touchNode) {
                             graph.removeArc(arc);
-                            arc = new Arc(initialNode, touchNode);
+                            arc = new Arc(initialNode, touchNode, "");
                             graph.addArc(arc);
 
                             arc.reset();
@@ -95,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
                             arc.lineTo(touchNode.getCoordX(), touchNode.getCoordY());
 
                             update();
-                        }
-                        else{
+                        } else {
                             graph.removeArc(arc);
                             update();
                         }
@@ -119,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-        public Node findTouchNode (float coordX, float coordY) {
+    public Node findTouchNode (float coordX, float coordY) {
         Node n = null;
 
         for (Node node : graph.getNodes()) {
@@ -139,6 +143,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+       /* super.onCreateContextMenu (menu,v,menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);*/
+       menu.setHeaderTitle("Blabla");
+       getMenuInflater().inflate(R.menu.context_menu, menu);
+
+    }
+
+    @Override
+    public boolean onContextItemSelected (MenuItem item) {
+
+        if (item.getItemId() == R.id.itemDelete) {
+            Toast.makeText(getApplicationContext(), "Noeud supprimé", Toast.LENGTH_SHORT);
+        }
+        if (item.getItemId() == R.id.itemModifiyColor) {
+            Toast.makeText(getApplicationContext(), "Modifier couleur", Toast.LENGTH_SHORT);
+        }
+
+        if (item.getItemId() == R.id.itemModifiyLabel) {
+            Toast.makeText(getApplicationContext(), "Modifier etiquette", Toast.LENGTH_SHORT);
+        }
+
+        if (item.getItemId() == R.id.itemModifiySize) {
+            Toast.makeText(getApplicationContext(), "Modifier la taille", Toast.LENGTH_SHORT);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
@@ -148,27 +182,23 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemID = item.getItemId();
         if(itemID == R.id.resetButton){
-            //Toast.makeText(getApplicationContext(),"RESET", Toast.LENGTH_SHORT).show();
             initialiserGraph();
             update();
         }
         if(itemID == R.id.delButton){
-            //Toast.makeText(getApplicationContext(),"DELETE", Toast.LENGTH_SHORT).show();
             graph = new Graph();
             update();
         }
         else if(itemID == R.id.addNodeModeButton){
-            //Toast.makeText(getApplicationContext(),"NOEUD", Toast.LENGTH_SHORT).show();
-            graph.addNode(new Node(300, 300, "blue", nodeSize));
+            graph.addNode(new Node(300, 300, "noir", nodeSize));
             update();
             mode = Modes.NodeMode;
         }
         else if(itemID == R.id.modeArcButton){
-            //Toast.makeText(getApplicationContext(),"ARC", Toast.LENGTH_SHORT).show();
             mode = Modes.ArcMode;
         }
         else if(itemID == R.id.modeEditButton){
-            mode = Modes.NodeMode;
+            mode = Modes.EditMode;
         }
 
         return super.onOptionsItemSelected(item);

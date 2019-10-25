@@ -6,11 +6,13 @@ public class Arc extends Path {
 
     private Node node1;
     private Node node2;
+    private String label;
 
-    public Arc (Node node1, Node node2) {
+    public Arc (Node node1, Node node2, String label) {
         super ();
         this.node1 = node1;
         this.node2 = node2;
+        this.label = label;
         this.moveTo(node1.getCoordX(),node1.getCoordY());
         this.lineTo(node2.getCoordX(),node2.getCoordY());
     }
