@@ -26,11 +26,12 @@ public class DrawableGraph extends Drawable {
     @Override
     public void draw(@NonNull Canvas canvas) {
         Paint p = new Paint();
+        p.setColor(Color.BLUE);
         for (Node node : graph.getNodes()) {
             canvas.drawRoundRect(node.getCoordX()-50, node.getCoordY()-50, node.getCoordX()+nodeSize/2, node.getCoordY()+nodeSize/2,50,50,p);
         }
 
-        p.setColor(Color.BLUE);
+        p.setColor(Color.GRAY);
         p.setStrokeWidth(8);
 
         for (Arc arc : graph.getArcs()) {

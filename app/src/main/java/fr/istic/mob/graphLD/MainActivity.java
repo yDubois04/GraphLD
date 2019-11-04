@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     int imageViewHeight, imageViewWidth;
     Modes mode;
-    private int nodeSize = 80;
+    private int nodeSize = 0;
 
     Node initialNode = null;
     Node nodeTMP = null;
@@ -32,6 +32,11 @@ public class MainActivity extends AppCompatActivity {
 
     Node currentNode = null;
     boolean hasTouchMoved = false;
+
+    final float SENSITIVE_MOVE = 2f;
+    private float currentTouchX = 0;
+    private float currentTouchY = 0;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -51,20 +56,24 @@ public class MainActivity extends AppCompatActivity {
                 final int action = motionEvent.getAction();
                 float x = motionEvent.getX();
                 float y = motionEvent.getY();
+                float xTouchVariation = Math.abs(currentTouchX-x);
+                float yTouchVariation = Math.abs(currentTouchY-y);
+                currentTouchX = motionEvent.getX();
+                currentTouchY = motionEvent.getY();
 
-                Node touchNode = findTouchNode(x, y);
+                Node touchNode = findTouchNode(x,y);
 
                 if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
                     if (action == MotionEvent.ACTION_DOWN ) {
                         hasTouchMoved = false;
                         currentNode = touchNode;
                     }
-                    else if(action == MotionEvent.ACTION_MOVE){
-                        if ((x < imageViewWidth-nodeSize/2 && y <imageViewHeight-nodeSize/2) && (x > nodeSize/2 && y >nodeSize/2)) {
+                    else if(action == MotionEvent.ACTION_MOVE && (xTouchVariation > SENSITIVE_MOVE || yTouchVariation > SENSITIVE_MOVE) && currentNode != null){
+                        if ((currentTouchX < imageViewWidth-nodeSize/2 && currentTouchY <imageViewHeight-nodeSize/2) && (currentTouchX> nodeSize/2 && y >nodeSize/2)) {
                             hasTouchMoved = true;
 
-                            currentNode.setCoordX(x);
-                            currentNode.setCoordY(y);
+                            currentNode.setCoordX(currentTouchX);
+                            currentNode.setCoordY(currentTouchY);
                             for (Arc arc : graph.getArcs()) {
                                 if (arc.getNode1() == currentNode || arc.getNode2() == currentNode) {
                                     arc.reset();
@@ -165,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu (menu,v,menuInfo);
-        if(currentNode != null && !hasTouchMoved) {
+        if(currentNode != null && !hasTouchMoved && mode == Modes.EditMode) {
             getMenuInflater().inflate(R.menu.context_menu, menu);
         }
     }
@@ -174,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onContextItemSelected (MenuItem item) {
 
         if (item.getItemId() == R.id.itemDelete) {
-            Toast.makeText(getApplicationContext(), "Noeud supprimé", Toast.LENGTH_SHORT);
+            this.graph.removeNodes(currentNode);
         }
         if (item.getItemId() == R.id.itemModifiyColor) {
             Toast.makeText(getApplicationContext(), "Modifier couleur", Toast.LENGTH_SHORT);
@@ -187,7 +196,8 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.itemModifiySize) {
             Toast.makeText(getApplicationContext(), "Modifier la taille", Toast.LENGTH_SHORT);
         }
-        return true;
+        this.update();
+        return super.onContextItemSelected(item);
     }
 
     @Override

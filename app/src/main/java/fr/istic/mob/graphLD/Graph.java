@@ -33,4 +33,21 @@ public class Graph {
         arcs.remove(arc);
     }
 
+    public void removeNodes (Node node) {
+        ArrayList <Arc> arcsToRemove = new ArrayList<>();
+         for (Arc arc : arcs) {
+            if (arc.getNode1() == node || arc.getNode2() == node) {
+                arcsToRemove.add(arc);
+            }
+        }
+        this.removeArcs(arcsToRemove);
+        this.nodes.remove(node);
+    }
+
+    public void removeArcs (List<Arc> arcs) {
+        for (Arc arc : arcs) {
+            this.arcs.remove(arc);
+        }
+    }
+
 }

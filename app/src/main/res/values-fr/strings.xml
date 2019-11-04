@@ -4,7 +4,7 @@
     <string name="add_node_button">Mode ajouter noeud</string>
     <string name="delete_button">Supprimer le graphe</string>
     <string name="edition_mode_button">Mode edition</string>
-    <string name="item_delete_node">Supprimer le graphe</string>
+    <string name="item_delete_node">Supprimer le noeud</string>
     <string name="item_modify_node_color">Modifier la couleur</string>
     <string name="item_modify_node_label">Modifier l\'etiquette</string>
     <string name="item_modify_node_size">Modifier la taille</string>
