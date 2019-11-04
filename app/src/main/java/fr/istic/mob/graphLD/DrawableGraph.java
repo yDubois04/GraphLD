@@ -1,6 +1,7 @@
 package fr.istic.mob.graphLD;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -29,8 +30,11 @@ public class DrawableGraph extends Drawable {
             canvas.drawRoundRect(node.getCoordX()-50, node.getCoordY()-50, node.getCoordX()+nodeSize/2, node.getCoordY()+nodeSize/2,50,50,p);
         }
 
+        p.setColor(Color.BLUE);
+        p.setStrokeWidth(8);
+
         for (Arc arc : graph.getArcs()) {
-            p.setStyle (Paint.Style.STROKE);
+            p.setStyle (Paint.Style.STROKE);;
             canvas.drawPath(arc,p);
         }
     }

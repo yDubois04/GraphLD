@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/itemDelete"
+        android:title="@string/item_delete_node"/>
+    <item
+        android:id="@+id/itemModifiyLabel"
+        android:title="@string/item_modify_node_label"/>
+    <item
+        android:id="@+id/itemModifiySize"
+        android:title="@string/item_modify_node_size"/>
+    <item
+        android:id="@+id/itemModifiyColor"
+        android:title="@string/item_modify_node_color"/>
+
+</menu>

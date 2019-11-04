@@ -3,15 +3,19 @@ package fr.istic.mob.graphLD;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.GestureDetector;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,13 +30,20 @@ public class MainActivity extends AppCompatActivity {
     Node nodeTMP = null;
     Arc arc = null;
 
+    Node currentNode = null;
+    boolean hasTouchMoved = false;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
         setContentView(R.layout.activity_main);
         imageView = findViewById(R.id.imageView);
+        registerForContextMenu(imageView);
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -41,30 +52,41 @@ public class MainActivity extends AppCompatActivity {
                 float x = motionEvent.getX();
                 float y = motionEvent.getY();
 
-                Node touchNode = findTouchNode (x,y);
+                Node touchNode = findTouchNode(x, y);
 
-                if (mode == Modes.NodeMode && touchNode != null) {
-                    if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP) {
-                        touchNode.setCoordX(x);
-                        touchNode.setCoordY(y);
-                        for (Arc arc : graph.getArcs()) {
-                            if(arc.getNode1() == touchNode || arc.getNode2() == touchNode){
-                                arc.reset();
-                                Node node1 = arc.getNode1();
-                                Node node2 = arc.getNode2();
-                                arc.moveTo(node1.getCoordX(), node1.getCoordY());
-                                arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
+                    if (action == MotionEvent.ACTION_DOWN ) {
+                        hasTouchMoved = false;
+                        currentNode = touchNode;
+                    }
+                    else if(action == MotionEvent.ACTION_MOVE){
+                        if ((x < imageViewWidth-nodeSize/2 && y <imageViewHeight-nodeSize/2) && (x > nodeSize/2 && y >nodeSize/2)) {
+                            hasTouchMoved = true;
+
+                            currentNode.setCoordX(x);
+                            currentNode.setCoordY(y);
+                            for (Arc arc : graph.getArcs()) {
+                                if (arc.getNode1() == currentNode || arc.getNode2() == currentNode) {
+                                    arc.reset();
+                                    Node node1 = arc.getNode1();
+                                    Node node2 = arc.getNode2();
+                                    arc.moveTo(node1.getCoordX(), node1.getCoordY());
+                                    arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                                }
                             }
+                            update();
                         }
-                        update();
                     }
                 }
+                else if(touchNode == null){
+                    currentNode = null;
+                }
 
-                if (mode == Modes.ArcMode){
-                    if(action == MotionEvent.ACTION_DOWN && touchNode != null){
+                if (mode == Modes.ArcMode) {
+                    if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
                         nodeTMP = new Node(x, y, "noir", nodeSize);
-                        arc = new Arc(initialNode, nodeTMP);
+                        arc = new Arc(initialNode, nodeTMP, "");
                         graph.addArc(arc);
 
                         arc.reset();
@@ -73,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
                         update();
                     }
-                    if(action == MotionEvent.ACTION_MOVE){
-                        if(nodeTMP != null) {
+                    if (action == MotionEvent.ACTION_MOVE) {
+                        if (nodeTMP != null) {
                             nodeTMP.setCoordX(x);
                             nodeTMP.setCoordY(y);
 
@@ -85,10 +107,10 @@ public class MainActivity extends AppCompatActivity {
                             update();
                         }
                     }
-                    if(action == MotionEvent.ACTION_UP){
-                        if(touchNode != null && nodeTMP != touchNode){
+                    if (action == MotionEvent.ACTION_UP) {
+                        if (touchNode != null && nodeTMP != touchNode) {
                             graph.removeArc(arc);
-                            arc = new Arc(initialNode, touchNode);
+                            arc = new Arc(initialNode, touchNode, "");
                             graph.addArc(arc);
 
                             arc.reset();
@@ -96,15 +118,14 @@ public class MainActivity extends AppCompatActivity {
                             arc.lineTo(touchNode.getCoordX(), touchNode.getCoordY());
 
                             update();
-                        }
-                        else{
+                        } else {
                             graph.removeArc(arc);
                             update();
                         }
                     }
                 }
 
-                return true;
+                return false;
             }
         });
 
@@ -114,13 +135,15 @@ public class MainActivity extends AppCompatActivity {
                 imageViewWidth = imageView.getWidth();
                 imageViewHeight = imageView.getHeight();
 
+                nodeSize = imageViewWidth/12;
+
                 initialiserGraph();
                 update();
             }
         });
     }
 
-        public Node findTouchNode (float coordX, float coordY) {
+    public Node findTouchNode (float coordX, float coordY) {
         Node n = null;
 
         for (Node node : graph.getNodes()) {
@@ -135,8 +158,36 @@ public class MainActivity extends AppCompatActivity {
         mode = Modes.NodeMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node(imageViewWidth/10f * i + nodeSize/2f + 10, nodeSize/2f + 10, "noir", nodeSize));
+            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f + 10, nodeSize/2f + 10, "noir", nodeSize));
         }
+    }
+
+    @Override
+    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu (menu,v,menuInfo);
+        if(currentNode != null && !hasTouchMoved) {
+            getMenuInflater().inflate(R.menu.context_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected (MenuItem item) {
+
+        if (item.getItemId() == R.id.itemDelete) {
+            Toast.makeText(getApplicationContext(), "Noeud supprimé", Toast.LENGTH_SHORT);
+        }
+        if (item.getItemId() == R.id.itemModifiyColor) {
+            Toast.makeText(getApplicationContext(), "Modifier couleur", Toast.LENGTH_SHORT);
+        }
+
+        if (item.getItemId() == R.id.itemModifiyLabel) {
+            Toast.makeText(getApplicationContext(), "Modifier etiquette", Toast.LENGTH_SHORT);
+        }
+
+        if (item.getItemId() == R.id.itemModifiySize) {
+            Toast.makeText(getApplicationContext(), "Modifier la taille", Toast.LENGTH_SHORT);
+        }
+        return true;
     }
 
     @Override
@@ -149,27 +200,23 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemID = item.getItemId();
         if(itemID == R.id.resetButton){
-            //Toast.makeText(getApplicationContext(),"RESET", Toast.LENGTH_SHORT).show();
             initialiserGraph();
             update();
         }
         if(itemID == R.id.delButton){
-            //Toast.makeText(getApplicationContext(),"DELETE", Toast.LENGTH_SHORT).show();
             graph = new Graph();
             update();
         }
         else if(itemID == R.id.addNodeModeButton){
-            //Toast.makeText(getApplicationContext(),"NOEUD", Toast.LENGTH_SHORT).show();
-            graph.addNode(new Node(300, 300, "blue", nodeSize));
+            graph.addNode(new Node(300, 300, "noir", nodeSize));
             update();
             mode = Modes.NodeMode;
         }
         else if(itemID == R.id.modeArcButton){
-            //Toast.makeText(getApplicationContext(),"ARC", Toast.LENGTH_SHORT).show();
             mode = Modes.ArcMode;
         }
         else if(itemID == R.id.modeEditButton){
-            mode = Modes.NodeMode;
+            mode = Modes.EditMode;
         }
 
         return super.onOptionsItemSelected(item);

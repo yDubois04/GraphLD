@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GraphLD</string>
+    <string name="add_node_button">Add node mode</string>
+    <string name="delete_button">Delete graphe</string>
+    <string name="edition_mode_button">Edit mode</string>
+    <string name="item_delete_node">Delete graphe</string>
+    <string name="item_modify_node_color">Modify color</string>
+    <string name="item_modify_node_label">Modifiy label</string>
+    <string name="item_modify_node_size">Modify size</string>
+    <string name="mode_arc_button">Arc mode</string>
+    <string name="reset_button">Reinitialize graph</string>
+</resources>
