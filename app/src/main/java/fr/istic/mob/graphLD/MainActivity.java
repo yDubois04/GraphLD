@@ -3,9 +3,13 @@ package fr.istic.mob.graphLD;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -13,7 +17,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -24,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     int imageViewHeight, imageViewWidth;
     Modes mode;
-    private int nodeSize = 80;
+    private int nodeSize;
 
     Node initialNode = null;
     Node nodeTMP = null;
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                         hasTouchMoved = false;
                         currentNode = touchNode;
                     }
-                    else if(action == MotionEvent.ACTION_MOVE){
+                    else if(action == MotionEvent.ACTION_MOVE && currentNode != null){
                         if ((x < imageViewWidth-nodeSize/2 && y <imageViewHeight-nodeSize/2) && (x > nodeSize/2 && y >nodeSize/2)) {
                             hasTouchMoved = true;
 
@@ -86,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
                         nodeTMP = new Node(x, y, "noir", nodeSize);
-                        arc = new Arc(initialNode, nodeTMP, "");
+                        arc = new Arc(initialNode, nodeTMP);
                         graph.addArc(arc);
 
                         arc.reset();
@@ -110,13 +117,14 @@ public class MainActivity extends AppCompatActivity {
                     if (action == MotionEvent.ACTION_UP) {
                         if (touchNode != null && nodeTMP != touchNode) {
                             graph.removeArc(arc);
-                            arc = new Arc(initialNode, touchNode, "");
+                            arc = new Arc(initialNode, touchNode);
                             graph.addArc(arc);
 
                             arc.reset();
                             arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
                             arc.lineTo(touchNode.getCoordX(), touchNode.getCoordY());
 
+                            showAddItemDialog(MainActivity.this);
                             update();
                         } else {
                             graph.removeArc(arc);
@@ -225,5 +233,29 @@ public class MainActivity extends AppCompatActivity {
     private void update(){
         drawableGraph = new DrawableGraph(graph, nodeSize);
         imageView.setImageDrawable(drawableGraph);
+    }
+
+
+    private void showAddItemDialog(final Context c) {
+        final EditText taskEditText = new EditText(c);
+        AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle("Add a new arc")
+                .setMessage("What is the name of the arc?")
+                .setView(taskEditText)
+                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        TextView tV = new TextView(c);
+                        tV.setX(arc.getNode1().getCoordX());
+                        tV.setY(arc.getNode2().getCoordY());
+                        tV.setText(taskEditText.getText());
+                        tV.setTextSize(TypedValue.COMPLEX_UNIT_SP,14);
+                        arc.setLabel(tV);
+                        arc.getLabel().setVisibility(imageView.VISIBLE);
+                        update();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 }
