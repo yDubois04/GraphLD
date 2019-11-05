@@ -10,4 +10,9 @@
     <string name="item_modify_node_size">Modify size</string>
     <string name="mode_arc_button">Arc mode</string>
     <string name="reset_button">Reset graph</string>
+    <string name="popup_add_arc_message">Enter arc label</string>
+    <string name="popup_validate">Validate</string>
+    <string name="popup_add_arc_title">Add arc</string>
+    <string name="popup_modify_label_node">Modify node label</string>
+    <string name="popup_modify_label_node_message">Enter new node label</string>
 </resources>

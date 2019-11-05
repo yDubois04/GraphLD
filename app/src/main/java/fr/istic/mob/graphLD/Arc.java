@@ -1,6 +1,7 @@
 package fr.istic.mob.graphLD;
 
 import android.graphics.Path;
+import android.widget.TextView;
 
 public class Arc extends Path {
 
@@ -8,11 +9,10 @@ public class Arc extends Path {
     private Node node2;
     private String label;
 
-    public Arc (Node node1, Node node2, String label) {
+    public Arc (Node node1, Node node2) {
         super ();
         this.node1 = node1;
         this.node2 = node2;
-        this.label = label;
         this.moveTo(node1.getCoordX(),node1.getCoordY());
         this.lineTo(node2.getCoordX(),node2.getCoordY());
     }
@@ -31,5 +31,13 @@ public class Arc extends Path {
 
     public void setNode2(Node node2) {
         this.node2 = node2;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

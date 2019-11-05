@@ -3,16 +3,17 @@ package fr.istic.mob.graphLD;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
-import android.graphics.Canvas;
 import android.os.Bundle;
-import android.view.GestureDetector;
 import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
                         nodeTMP = new Node(x, y, "noir", nodeSize);
-                        arc = new Arc(initialNode, nodeTMP, "");
+                        arc = new Arc(initialNode, nodeTMP);
                         graph.addArc(arc);
 
                         arc.reset();
@@ -119,13 +120,14 @@ public class MainActivity extends AppCompatActivity {
                     if (action == MotionEvent.ACTION_UP) {
                         if (touchNode != null && nodeTMP != touchNode) {
                             graph.removeArc(arc);
-                            arc = new Arc(initialNode, touchNode, "");
+                            arc = new Arc(initialNode, touchNode);
                             graph.addArc(arc);
 
                             arc.reset();
                             arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
                             arc.lineTo(touchNode.getCoordX(), touchNode.getCoordY());
 
+                            showAddArcItemDialog(MainActivity.this);
                             update();
                         } else {
                             graph.removeArc(arc);
@@ -190,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (item.getItemId() == R.id.itemModifiyLabel) {
-            Toast.makeText(getApplicationContext(), "Modifier etiquette", Toast.LENGTH_SHORT);
+            showModifyNodeLabelItemDialog(MainActivity.this);
         }
 
         if (item.getItemId() == R.id.itemModifiySize) {
@@ -235,5 +237,41 @@ public class MainActivity extends AppCompatActivity {
     private void update(){
         drawableGraph = new DrawableGraph(graph, nodeSize);
         imageView.setImageDrawable(drawableGraph);
+    }
+
+    private void showAddArcItemDialog(final Context c) {
+        final EditText taskEditText = new EditText(c);
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_add_arc_title)
+                .setMessage(R.string.popup_add_arc_message)
+                .setView(taskEditText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String value = taskEditText.getText().toString();
+                        arc.setLabel(value);
+                        update();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showModifyNodeLabelItemDialog(final Context c) {
+        final EditText taskEditText = new EditText(c);
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_modify_label_node)
+                .setMessage(R.string.popup_modify_label_node_message)
+                .setView(taskEditText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String value = taskEditText.getText().toString();
+                        currentNode.setLabel(value);
+                        update();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 }
