@@ -14,4 +14,13 @@
     <string name="popup_add_arc_title">Ajout d\'un arc</string>
     <string name="popup_modify_label_node">Modifier l\'étiquette du noeud</string>
     <string name="popup_modify_label_node_message">Saisissez la nouvelle étiquette du noeud</string>
+    <string name="color_noir">Noir</string>
+    <string name="color_red">Rouge</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_blue">Bleu</string>
+    <string name="color_green">Vert</string>
+    <string name="color_cyan">Cyan</string>
+    <string name="color_magenta">Mangenta</string>
+    <string name="popup_modify_color_node_message">Choisissez la nouvelle couleur du noeud</string>
+    <string name="item_send_email">Envoyer le graphe par email</string>
 </resources>

@@ -1,7 +1,6 @@
 package fr.istic.mob.graphLD;
 
 import android.graphics.Path;
-import android.widget.TextView;
 
 public class Arc extends Path {
 

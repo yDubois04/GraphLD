@@ -50,6 +50,7 @@ public class Node extends RectF {
 
     public void setNodeSize(int nodeSize) {
         this.nodeSize = nodeSize;
+        super.set (coordX-nodeSize/2,this.coordY-nodeSize/2, coordX+nodeSize/2, this.coordY+nodeSize/2);
     }
 
     public String getLabel() {

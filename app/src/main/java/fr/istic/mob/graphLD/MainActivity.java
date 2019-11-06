@@ -1,13 +1,19 @@
 package fr.istic.mob.graphLD;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,8 +21,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private float currentTouchX = 0;
     private float currentTouchY = 0;
 
+    Bitmap bitmap;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -95,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 if (mode == Modes.ArcMode) {
                     if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
-                        nodeTMP = new Node(x, y, "noir", nodeSize);
+                        nodeTMP = new Node(x, y, "Noir", nodeSize);
                         arc = new Arc(initialNode, nodeTMP);
                         graph.addArc(arc);
 
@@ -169,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         mode = Modes.NodeMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f + 10, nodeSize/2f + 10, "noir", nodeSize));
+            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f + 10, nodeSize/2f + 10, "Noir", nodeSize));
         }
     }
 
@@ -188,15 +197,15 @@ public class MainActivity extends AppCompatActivity {
             this.graph.removeNodes(currentNode);
         }
         if (item.getItemId() == R.id.itemModifiyColor) {
-            Toast.makeText(getApplicationContext(), "Modifier couleur", Toast.LENGTH_SHORT);
+            showModifyNodeColorPopup(MainActivity.this);
         }
 
         if (item.getItemId() == R.id.itemModifiyLabel) {
-            showModifyNodeLabelItemDialog(MainActivity.this);
+            showModifyNodeLabelPopup(MainActivity.this);
         }
 
         if (item.getItemId() == R.id.itemModifiySize) {
-            Toast.makeText(getApplicationContext(), "Modifier la taille", Toast.LENGTH_SHORT);
+            showModifyNodeSizePopup (MainActivity.this);
         }
         this.update();
         return super.onContextItemSelected(item);
@@ -220,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
             update();
         }
         else if(itemID == R.id.addNodeModeButton){
-            graph.addNode(new Node(300, 300, "noir", nodeSize));
+            graph.addNode(new Node(300, 300, "Noir", nodeSize));
             update();
             mode = Modes.NodeMode;
         }
@@ -230,12 +239,44 @@ public class MainActivity extends AppCompatActivity {
         else if(itemID == R.id.modeEditButton){
             mode = Modes.EditMode;
         }
+        else if (itemID == R.id.sendGraphByEmail) {
+          saveGraph();
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void saveGraph () {
+        Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bitmap);
+        imageView.draw(c);
+
+        try {
+            File file = new File (getExternalFilesDir(null),"Graph.png");
+            FileOutputStream outputFile = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputFile);
+            outputFile.flush();
+            outputFile.close();
+            sendGraphByMail(file.getAbsolutePath());
+
+        }
+        catch (Exception e){
+            System.out.println("Erreur" +e);
+        }
+    }
+
+    private void sendGraphByMail (String path) {
+        System.out.println("Envoyer mail");
+        Intent emailInt = new Intent(Intent.ACTION_SEND);
+        emailInt.putExtra(Intent.EXTRA_SUBJECT, "Graphe");
+        emailInt.setType("image/png");
+        Uri uri = Uri.parse(path);
+        emailInt.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(emailInt,"Send graph"));
+    }
+
     private void update(){
-        drawableGraph = new DrawableGraph(graph, nodeSize);
+        drawableGraph = new DrawableGraph(graph, nodeSize, getApplicationContext());
         imageView.setImageDrawable(drawableGraph);
     }
 
@@ -257,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showModifyNodeLabelItemDialog(final Context c) {
+    private void showModifyNodeLabelPopup(final Context c) {
         final EditText taskEditText = new EditText(c);
         final AlertDialog dialog = new AlertDialog.Builder(c)
                 .setTitle(R.string.popup_modify_label_node)
@@ -268,6 +309,55 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String value = taskEditText.getText().toString();
                         currentNode.setLabel(value);
+                        update();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showModifyNodeColorPopup(final Context c) {
+
+        final String [] colors = {getString(R.string.color_blue), getString(R.string.color_cyan), getString(R.string.color_green),
+                getString(R.string.color_noir), getString(R.string.color_magenta), getString(R.string.color_orange), getString(R.string.color_red)};
+
+        AlertDialog.Builder popup = new AlertDialog.Builder(c);
+        popup.setTitle(R.string.popup_modify_color_node_message);
+        int  itemChecked = 0;
+        popup.setSingleChoiceItems(colors, itemChecked, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int index) {
+                currentNode.setColor(colors [index]);
+                update();
+            }
+        });
+        popup.setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = popup.create();
+        dialog.show();
+    }
+
+    private void showModifyNodeSizePopup (Context c) {
+        final EditText modifySizeText = new EditText(c);
+        modifySizeText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        modifySizeText.setRawInputType(Configuration.KEYBOARD_12KEY);
+
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_modify_label_node)
+                .setMessage(R.string.popup_modify_label_node_message)
+                .setView(modifySizeText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int value = Integer.parseInt(modifySizeText.getText().toString());
+                        if (value < 100) {
+                            currentNode.setNodeSize(value);
+                        }
                         update();
                     }
                 })

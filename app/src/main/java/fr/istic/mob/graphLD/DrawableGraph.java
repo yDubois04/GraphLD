@@ -1,5 +1,7 @@
 package fr.istic.mob.graphLD;
 
+import fr.istic.mob.graphLD.R;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -20,14 +22,16 @@ public class DrawableGraph extends Drawable {
     private Paint paintNode;
     private Paint paintArc;
     private Paint paintText;
+    private Context context;
 
 
-    public DrawableGraph(Graph graph, int newNodeSize) {
+    public DrawableGraph(Graph graph, int newNodeSize, Context context) {
         this.graph = graph;
         this.nodeSize = newNodeSize;
         this.paintNode = new Paint ();
         this.paintArc = new Paint ();
         this.paintText = new Paint ();
+        this.context = context;
 
         this.initPaint();
     }
@@ -38,6 +42,7 @@ public class DrawableGraph extends Drawable {
         float [] middle;
 
         for (Node node : graph.getNodes()) {
+            this.chooseNodeColor(node.getColor());
             canvas.drawRoundRect(node.getCoordX()-50, node.getCoordY()-50, node.getCoordX()+nodeSize/2, node.getCoordY()+nodeSize/2,50,50,paintNode);
             if (node.getLabel() != null) {
                 canvas.drawText(node.getLabel(), node.getCoordX(),node.getCoordY(),paintText);
@@ -54,8 +59,6 @@ public class DrawableGraph extends Drawable {
     }
 
     private void initPaint () {
-        paintNode.setColor(Color.BLUE);
-
         paintArc.setColor(Color.BLUE);
         paintArc.setStrokeWidth(8);
         paintArc.setStyle(Paint.Style.STROKE);
@@ -73,6 +76,34 @@ public class DrawableGraph extends Drawable {
         measure.getPosTan(measure.getLength() * 0.5f, middle,tangent);
 
         return middle;
+    }
+
+    private void chooseNodeColor (String color) {
+
+        if (color.equals(context.getString(R.string.color_red))) {
+            paintNode.setColor(Color.RED);
+        }
+        else if (color.equals(context.getString(R.string.color_green))) {
+            paintNode.setColor(Color.GREEN);
+        }
+        else if (color.equals(context.getString(R.string.color_blue))) {
+            paintNode.setColor(Color.BLUE);
+        }
+        else if (color.equals(context.getString(R.string.color_orange))) {
+           paintNode.setColor(Color.rgb(255,102,0));
+        }
+        else if (color.equals(context.getString(R.string.color_cyan))) {
+            paintNode.setColor(Color.CYAN);
+        }
+        else if (color.equals(context.getString(R.string.color_magenta))) {
+            paintNode.setColor(Color.MAGENTA);
+        }
+        else if (color.equals(context.getString(R.string.color_noir))) {
+            paintNode.setColor(Color.BLACK);
+        }
+        else {
+            paintNode.setColor(Color.BLACK);
+        }
     }
 
     @Override
