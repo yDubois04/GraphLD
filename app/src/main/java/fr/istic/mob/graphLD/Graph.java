@@ -1,9 +1,10 @@
 package fr.istic.mob.graphLD;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Graph {
+public class Graph implements Serializable {
 
     private List<Node> nodes;
     private List<Arc> arcs;
@@ -31,6 +32,23 @@ public class Graph {
 
     public void removeArc (Arc arc) {
         arcs.remove(arc);
+    }
+
+    public void removeNodes (Node node) {
+        ArrayList <Arc> arcsToRemove = new ArrayList<>();
+         for (Arc arc : arcs) {
+            if (arc.getNode1() == node || arc.getNode2() == node) {
+                arcsToRemove.add(arc);
+            }
+        }
+        this.removeArcs(arcsToRemove);
+        this.nodes.remove(node);
+    }
+
+    public void removeArcs (List<Arc> arcs) {
+        for (Arc arc : arcs) {
+            this.arcs.remove(arc);
+        }
     }
 
 }

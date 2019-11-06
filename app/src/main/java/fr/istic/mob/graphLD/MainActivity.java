@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +15,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -27,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     int imageViewHeight, imageViewWidth;
     Modes mode;
-    private int nodeSize;
+    private int nodeSize = 0;
 
     Node initialNode = null;
     Node nodeTMP = null;
@@ -36,13 +34,20 @@ public class MainActivity extends AppCompatActivity {
     Node currentNode = null;
     boolean hasTouchMoved = false;
 
+    final float SENSITIVE_MOVE = 2f;
+    private float currentTouchX = 0;
+    private float currentTouchY = 0;
+
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        if (savedInstanceState != null){
+            Graph retrievedGraph = (Graph) savedInstanceState.getSerializable("Graph");
+            graph = retrievedGraph;
+        }
 
         setContentView(R.layout.activity_main);
         imageView = findViewById(R.id.imageView);
@@ -54,20 +59,24 @@ public class MainActivity extends AppCompatActivity {
                 final int action = motionEvent.getAction();
                 float x = motionEvent.getX();
                 float y = motionEvent.getY();
+                float xTouchVariation = Math.abs(currentTouchX-x);
+                float yTouchVariation = Math.abs(currentTouchY-y);
+                currentTouchX = motionEvent.getX();
+                currentTouchY = motionEvent.getY();
 
-                Node touchNode = findTouchNode(x, y);
+                Node touchNode = findTouchNode(x,y);
 
                 if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
                     if (action == MotionEvent.ACTION_DOWN ) {
                         hasTouchMoved = false;
                         currentNode = touchNode;
                     }
-                    else if(action == MotionEvent.ACTION_MOVE && currentNode != null){
-                        if ((x < imageViewWidth-nodeSize/2 && y <imageViewHeight-nodeSize/2) && (x > nodeSize/2 && y >nodeSize/2)) {
+                    else if(action == MotionEvent.ACTION_MOVE && (xTouchVariation > SENSITIVE_MOVE || yTouchVariation > SENSITIVE_MOVE) && currentNode != null){
+                        if ((currentTouchX < imageViewWidth-nodeSize/2 && currentTouchY <imageViewHeight-nodeSize/2) && (currentTouchX> nodeSize/2 && y >nodeSize/2)) {
                             hasTouchMoved = true;
 
-                            currentNode.setCoordX(x);
-                            currentNode.setCoordY(y);
+                            currentNode.setCoordX(currentTouchX);
+                            currentNode.setCoordY(currentTouchY);
                             for (Arc arc : graph.getArcs()) {
                                 if (arc.getNode1() == currentNode || arc.getNode2() == currentNode) {
                                     arc.reset();
@@ -120,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                             arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
                             arc.lineTo(touchNode.getCoordX(), touchNode.getCoordY());
 
-                            showAddItemDialog(MainActivity.this);
+                            showAddArcItemDialog(MainActivity.this);
                             update();
                         } else {
                             graph.removeArc(arc);
@@ -141,10 +150,18 @@ public class MainActivity extends AppCompatActivity {
 
                 nodeSize = imageViewWidth/12;
 
-                initialiserGraph();
+                if (graph == null){
+                    initialiserGraph();
+                }
                 update();
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("Graph", graph);
     }
 
     public Node findTouchNode (float coordX, float coordY) {
@@ -169,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu (menu,v,menuInfo);
-        if(currentNode != null && !hasTouchMoved) {
+        if(currentNode != null && !hasTouchMoved && mode == Modes.EditMode) {
             getMenuInflater().inflate(R.menu.context_menu, menu);
         }
     }
@@ -178,20 +195,21 @@ public class MainActivity extends AppCompatActivity {
     public boolean onContextItemSelected (MenuItem item) {
 
         if (item.getItemId() == R.id.itemDelete) {
-            Toast.makeText(getApplicationContext(), "Noeud supprimé", Toast.LENGTH_SHORT);
+            this.graph.removeNodes(currentNode);
         }
         if (item.getItemId() == R.id.itemModifiyColor) {
             Toast.makeText(getApplicationContext(), "Modifier couleur", Toast.LENGTH_SHORT);
         }
 
         if (item.getItemId() == R.id.itemModifiyLabel) {
-            Toast.makeText(getApplicationContext(), "Modifier etiquette", Toast.LENGTH_SHORT);
+            showModifyNodeLabelItemDialog(MainActivity.this);
         }
 
         if (item.getItemId() == R.id.itemModifiySize) {
             Toast.makeText(getApplicationContext(), "Modifier la taille", Toast.LENGTH_SHORT);
         }
-        return true;
+        this.update();
+        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -227,27 +245,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void update(){
-        drawableGraph = new DrawableGraph(graph, nodeSize);
+        drawableGraph = new DrawableGraph(graph, nodeSize, getApplicationContext());
         imageView.setImageDrawable(drawableGraph);
     }
 
-
-    private void showAddItemDialog(final Context c) {
+    private void showAddArcItemDialog(final Context c) {
         final EditText taskEditText = new EditText(c);
-        AlertDialog dialog = new AlertDialog.Builder(c)
-                .setTitle("Add a new arc")
-                .setMessage("What is the name of the arc?")
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_add_arc_title)
+                .setMessage(R.string.popup_add_arc_message)
                 .setView(taskEditText)
-                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        TextView tV = new TextView(c);
-                        tV.setX(arc.getNode1().getCoordX());
-                        tV.setY(arc.getNode2().getCoordY());
-                        tV.setText(taskEditText.getText());
-                        tV.setTextSize(TypedValue.COMPLEX_UNIT_SP,14);
-                        arc.setLabel(tV);
-                        arc.getLabel().setVisibility(imageView.VISIBLE);
+                        String value = taskEditText.getText().toString();
+                        arc.setLabel(value);
+                        update();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showModifyNodeLabelItemDialog(final Context c) {
+        final EditText taskEditText = new EditText(c);
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_modify_label_node)
+                .setMessage(R.string.popup_modify_label_node_message)
+                .setView(taskEditText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String value = taskEditText.getText().toString();
+                        currentNode.setLabel(value);
                         update();
                     }
                 })

@@ -60,8 +60,4 @@ public class Node extends RectF {
         this.label = label;
     }
 
-
-
-
-
 }

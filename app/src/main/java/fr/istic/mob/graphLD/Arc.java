@@ -7,7 +7,7 @@ public class Arc extends Path {
 
     private Node node1;
     private Node node2;
-    private TextView label;
+    private String label;
 
     public Arc (Node node1, Node node2) {
         super ();
@@ -33,11 +33,11 @@ public class Arc extends Path {
         this.node2 = node2;
     }
 
-    public TextView getLabel() {
+    public String getLabel() {
         return label;
     }
 
-    public void setLabel(TextView label) {
+    public void setLabel(String label) {
         this.label = label;
     }
 }
