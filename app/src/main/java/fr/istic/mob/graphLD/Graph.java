@@ -1,9 +1,10 @@
 package fr.istic.mob.graphLD;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Graph {
+public class Graph implements Serializable {
 
     private List<Node> nodes;
     private List<Arc> arcs;

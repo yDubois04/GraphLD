@@ -29,4 +29,6 @@
     <string name="item_modify_arc_label">Modifier l\'étiquette de l\'arc</string>
     <string name="item_modify_arc_thickness">Modifier l\'épaisseur de l\'arc</string>
     <string name="item_modify_label_arc_size">Modifier la taille de l\'étiquette de l\'arc</string>
+    <string name="popup_modify_node_size_message">Write the new size of the node (between 50 and 500)</string>
+    <string name="popup_modify_node_size">Modify node size</string>
 </resources>

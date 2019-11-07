@@ -2,7 +2,9 @@ package fr.istic.mob.graphLD;
 
 import android.graphics.RectF;
 
-public class Node extends RectF {
+import java.io.Serializable;
+
+public class Node extends RectF  implements Serializable {
 
     private float coordX;
     private float coordY;

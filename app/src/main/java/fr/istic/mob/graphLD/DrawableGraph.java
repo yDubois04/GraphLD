@@ -18,16 +18,14 @@ import androidx.annotation.RequiresApi;
 public class DrawableGraph extends Drawable {
 
     private Graph graph;
-    private int nodeSize;
     private Paint paintNode;
     private Paint paintArc;
     private Paint paintText;
     private Context context;
 
 
-    public DrawableGraph(Graph graph, int newNodeSize, Context context) {
+    public DrawableGraph(Graph graph, Context context) {
         this.graph = graph;
-        this.nodeSize = newNodeSize;
         this.paintNode = new Paint ();
         this.paintArc = new Paint ();
         this.paintText = new Paint ();
@@ -42,6 +40,7 @@ public class DrawableGraph extends Drawable {
         float [] middle;
 
         for (Node node : graph.getNodes()) {
+            int nodeSize = node.getNodeSize();
             this.chooseNodeColor(node.getColor());
             canvas.drawRoundRect(node.getCoordX()-50, node.getCoordY()-50, node.getCoordX()+nodeSize/2, node.getCoordY()+nodeSize/2,50,50,paintNode);
             if (node.getLabel() != null) {

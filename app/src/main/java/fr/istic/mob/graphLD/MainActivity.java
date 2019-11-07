@@ -54,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        if (savedInstanceState != null){
+            Graph retrievedGraph = (Graph) savedInstanceState.getSerializable("Graph");
+            graph = retrievedGraph;
+        }
 
         setContentView(R.layout.activity_main);
         imageView = findViewById(R.id.imageView);
@@ -167,10 +169,18 @@ public class MainActivity extends AppCompatActivity {
 
                 nodeSize = imageViewWidth/12;
 
-                initialiserGraph();
+                if (graph == null){
+                    initialiserGraph();
+                }
                 update();
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("Graph", graph);
     }
 
     public Node findTouchNode (float coordX, float coordY) {
@@ -312,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void update(){
-        drawableGraph = new DrawableGraph(graph, nodeSize, getApplicationContext());
+        drawableGraph = new DrawableGraph(graph, getApplicationContext());
         imageView.setImageDrawable(drawableGraph);
     }
 
@@ -384,14 +394,14 @@ public class MainActivity extends AppCompatActivity {
         modifySizeText.setRawInputType(Configuration.KEYBOARD_12KEY);
 
         final AlertDialog dialog = new AlertDialog.Builder(c)
-                .setTitle(R.string.popup_modify_label_node)
-                .setMessage(R.string.popup_modify_label_node_message)
+                .setTitle(R.string.popup_modify_node_size)
+                .setMessage(R.string.popup_modify_node_size_message)
                 .setView(modifySizeText)
                 .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         int value = Integer.parseInt(modifySizeText.getText().toString());
-                        if (value < 100) {
+                        if (value >= 50 && value <= 500) {
                             currentNode.setNodeSize(value);
                         }
                         update();
