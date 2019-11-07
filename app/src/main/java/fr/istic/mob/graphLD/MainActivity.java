@@ -10,9 +10,11 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -23,7 +25,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 
 public class MainActivity extends AppCompatActivity {
@@ -74,6 +75,15 @@ public class MainActivity extends AppCompatActivity {
                 currentTouchY = motionEvent.getY();
 
                 Node touchNode = findTouchNode(x,y);
+
+                for (Arc arcs : graph.getArcs()) {
+                    RectF bounds = new RectF();
+                    arcs.computeBounds(bounds,true);
+                    if (bounds.contains(x,y)) {
+                        arc = arcs;
+                    }
+                }
+                view.invalidate();
 
                 if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
                     if (action == MotionEvent.ACTION_DOWN ) {
@@ -142,11 +152,11 @@ public class MainActivity extends AppCompatActivity {
                             update();
                         } else {
                             graph.removeArc(arc);
+                            arc = null;
                             update();
                         }
                     }
                 }
-
                 return false;
             }
         });
@@ -196,8 +206,13 @@ public class MainActivity extends AppCompatActivity {
     public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu (menu,v,menuInfo);
         if(currentNode != null && !hasTouchMoved && mode == Modes.EditMode) {
-            getMenuInflater().inflate(R.menu.context_menu, menu);
+            getMenuInflater().inflate(R.menu.context_menu_modify_node, menu);
         }
+
+        else if(arc != null && mode == Modes.EditMode) {
+            getMenuInflater().inflate(R.menu.context_menu_modify_arc_menu, menu);
+        }
+
     }
 
     @Override
@@ -217,6 +232,27 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.itemModifiySize) {
             showModifyNodeSizePopup (MainActivity.this);
         }
+
+        if (item.getItemId() == R.id.itemDeleteArc) {
+            this.graph.removeArc(arc);
+        }
+
+        if (item.getItemId() == R.id.itemModifiyArcColor) {
+
+        }
+
+        if (item.getItemId() == R.id.itemModifiyArcLabel) {
+
+        }
+
+        if (item.getItemId() == R.id.itemModifiyArcLabelSize) {
+
+        }
+
+        if (item.getItemId() == R.id.itemModifiyArcThickness) {
+
+        }
+
         this.update();
         return super.onContextItemSelected(item);
     }
@@ -259,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
     private void saveGraph () {
         Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);
+        imageView.setBackgroundColor(Color.WHITE);
         imageView.draw(c);
 
         try {
@@ -276,10 +313,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendGraphByMail (String path) {
-        System.out.println("Envoyer mail");
         Intent emailInt = new Intent(Intent.ACTION_SEND);
         emailInt.putExtra(Intent.EXTRA_SUBJECT, "Graphe");
-        emailInt.setType("image/png");
+        emailInt.setType("image/*");
         Uri uri = Uri.parse(path);
         emailInt.putExtra(Intent.EXTRA_STREAM, uri);
         startActivity(Intent.createChooser(emailInt,"Send graph"));
