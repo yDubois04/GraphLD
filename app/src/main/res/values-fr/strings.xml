@@ -24,4 +24,9 @@
     <string name="color_red">Rouge</string>
     <string name="popup_modify_color_node_message">Choisissez la nouvelle couleur du noeud</string>
     <string name="item_send_email">Envoyer le graphe par email</string>
+    <string name="item_delete_arc">Supprimer l\'arc</string>
+    <string name="item_modify_arc_color">Modifier la couleur de l\'arc</string>
+    <string name="item_modify_arc_label">Modifier l\'étiquette de l\'arc</string>
+    <string name="item_modify_arc_thickness">Modifier l\'épaisseur de l\'arc</string>
+    <string name="item_modify_label_arc_size">Modifier la taille de l\'étiquette de l\'arc</string>
 </resources>

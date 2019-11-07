@@ -24,4 +24,9 @@
     <string name="color_red">Red</string>
     <string name="popup_modify_color_node_message">Choose new node color</string>
     <string name="item_send_email">Send graph by name</string>
+    <string name="item_delete_arc">Delete arc</string>
+    <string name="item_modify_arc_color">Modify arc color</string>
+    <string name="item_modify_arc_label">Modify arc label</string>
+    <string name="item_modify_arc_thickness">Modify arc thickness</string>
+    <string name="item_modify_label_arc_size">Modify arc label size</string>
 </resources>
