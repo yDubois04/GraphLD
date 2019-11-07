@@ -17,4 +17,7 @@
     <item
         android:id="@+id/modeEditButton"
         android:title="@string/edition_mode_button" />
+    <item
+        android:id="@+id/sendGraphByEmail"
+        android:title="@string/item_send_email" />
 </menu>

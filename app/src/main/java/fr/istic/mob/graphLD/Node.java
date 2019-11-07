@@ -2,7 +2,9 @@ package fr.istic.mob.graphLD;
 
 import android.graphics.RectF;
 
-public class Node extends RectF {
+import java.io.Serializable;
+
+public class Node extends RectF  implements Serializable {
 
     private float coordX;
     private float coordY;
@@ -50,6 +52,7 @@ public class Node extends RectF {
 
     public void setNodeSize(int nodeSize) {
         this.nodeSize = nodeSize;
+        super.set (coordX-nodeSize/2,this.coordY-nodeSize/2, coordX+nodeSize/2, this.coordY+nodeSize/2);
     }
 
     public String getLabel() {

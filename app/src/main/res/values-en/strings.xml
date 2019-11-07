@@ -15,4 +15,15 @@
     <string name="popup_add_arc_title">Add arc</string>
     <string name="popup_modify_label_node">Modify node label</string>
     <string name="popup_modify_label_node_message">Enter new node label</string>
+    <string name="color_noir">Black</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_cyan">Cyan</string>
+    <string name="color_green">Green</string>
+    <string name="color_magenta">Magenta</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_red">Red</string>
+    <string name="popup_modify_color_node_message">Choose new node color</string>
+    <string name="item_send_email">Send graph by name</string>
+    <string name="popup_modify_node_size_message">Write the new size of the node (between 50 and 500)</string>
+    <string name="popup_modify_node_size">Modify node size</string>
 </resources>

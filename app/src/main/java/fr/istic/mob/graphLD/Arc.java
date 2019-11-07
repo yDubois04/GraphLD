@@ -1,9 +1,10 @@
 package fr.istic.mob.graphLD;
 
 import android.graphics.Path;
-import android.widget.TextView;
 
-public class Arc extends Path {
+import java.io.Serializable;
+
+public class Arc extends Path  implements Serializable {
 
     private Node node1;
     private Node node2;
