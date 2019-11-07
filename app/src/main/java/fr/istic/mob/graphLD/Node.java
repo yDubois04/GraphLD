@@ -10,6 +10,7 @@ public class Node extends RectF  implements Serializable {
     private float coordY;
     private String color;
     private int nodeSize;
+    private int nodeLength;
     private String label;
 
     public Node(float coordX, float coordY, String couleur, int newNodeSize) {
@@ -18,6 +19,7 @@ public class Node extends RectF  implements Serializable {
         this.coordY = coordY;
         this.color = couleur;
         nodeSize = newNodeSize;
+        nodeLength = nodeSize;
     }
 
     public float getCoordX() {
@@ -53,6 +55,15 @@ public class Node extends RectF  implements Serializable {
     public void setNodeSize(int nodeSize) {
         this.nodeSize = nodeSize;
         super.set (coordX-nodeSize/2,this.coordY-nodeSize/2, coordX+nodeSize/2, this.coordY+nodeSize/2);
+    }
+
+    public int getNodeLength() {
+        return nodeLength;
+    }
+
+    public void setNodeLength(int nodeLength) {
+        this.nodeLength = nodeLength;
+        super.set (coordX-nodeLength/2,this.coordY-nodeSize/2, coordX+nodeLength/2, this.coordY+nodeSize/2);
     }
 
     public String getLabel() {

@@ -364,11 +364,14 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        int value = Integer.parseInt(modifySizeText.getText().toString());
-                        if (value >= 50 && value <= 500) {
-                            currentNode.setNodeSize(value);
+                        try {
+                            int value = Integer.parseInt(modifySizeText.getText().toString());
+                            if (value >= 50 && value <= 500) {
+                                currentNode.setNodeSize(value);
+                            }
+                            update();
                         }
-                        update();
+                        catch(Exception e){}
                     }
                 })
                 .create();

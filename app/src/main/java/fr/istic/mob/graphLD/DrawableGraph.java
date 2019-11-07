@@ -8,6 +8,7 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
@@ -40,11 +41,17 @@ public class DrawableGraph extends Drawable {
         float [] middle;
 
         for (Node node : graph.getNodes()) {
-            int nodeSize = node.getNodeSize();
-            this.chooseNodeColor(node.getColor());
-            canvas.drawRoundRect(node.getCoordX()-50, node.getCoordY()-50, node.getCoordX()+nodeSize/2, node.getCoordY()+nodeSize/2,50,50,paintNode);
             if (node.getLabel() != null) {
-                canvas.drawText(node.getLabel(), node.getCoordX(),node.getCoordY(),paintText);
+                float textSize = paintText.measureText(node.getLabel());
+                if (textSize > node.getNodeSize()) {
+                    node.setNodeLength((int) textSize + node.getNodeSize());
+                }
+            }
+            this.chooseNodeColor(node.getColor());
+            canvas.drawRoundRect(node.left, node.top, node.right, node.bottom,50,50,paintNode);
+
+            if (node.getLabel() != null) {
+                canvas.drawText(node.getLabel(), node.getCoordX() - node.getNodeLength()/2 + node.getNodeSize()/2, node.getCoordY(), paintText);
             }
         }
 
