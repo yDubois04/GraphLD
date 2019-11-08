@@ -25,6 +25,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     Arc arc = null;
 
     Node currentNode = null;
+    Arc currentArc = null;
     boolean hasTouchMoved = false;
 
     final float SENSITIVE_MOVE = 2f;
@@ -77,15 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 currentTouchY = motionEvent.getY();
 
                 Node touchNode = findTouchNode(x,y);
-
-                for (Arc arcs : graph.getArcs()) {
-                    RectF bounds = new RectF();
-                    arcs.computeBounds(bounds,true);
-                    if (bounds.contains(x,y)) {
-                        arc = arcs;
-                    }
-                }
-                view.invalidate();
+                Arc touchArc = findTouchArc(x, y);
 
                 if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
                     if (action == MotionEvent.ACTION_DOWN ) {
@@ -111,8 +105,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+                else if((mode == Modes.NodeMode || mode == Modes.EditMode) && touchArc != null){
+                    currentArc = touchArc;
+                }
                 else if(touchNode == null){
                     currentNode = null;
+                }
+                else if(touchArc == null){
+                    currentArc = null;
                 }
 
                 if (mode == Modes.ArcMode) {
@@ -128,17 +128,15 @@ public class MainActivity extends AppCompatActivity {
 
                         update();
                     }
-                    if (action == MotionEvent.ACTION_MOVE) {
-                        if (nodeTMP != null) {
-                            nodeTMP.setCoordX(x);
-                            nodeTMP.setCoordY(y);
+                    if (action == MotionEvent.ACTION_MOVE && nodeTMP != null) {
+                        nodeTMP.setCoordX(x);
+                        nodeTMP.setCoordY(y);
 
-                            arc.reset();
-                            arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
-                            arc.lineTo(nodeTMP.getCoordX(), nodeTMP.getCoordY());
+                        arc.reset();
+                        arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
+                        arc.lineTo(nodeTMP.getCoordX(), nodeTMP.getCoordY());
 
-                            update();
-                        }
+                        update();
                     }
                     if (action == MotionEvent.ACTION_UP) {
                         if (touchNode != null && nodeTMP != touchNode) {
@@ -190,17 +188,31 @@ public class MainActivity extends AppCompatActivity {
 
         for (Node node : graph.getNodes()) {
             if (node.contains(coordX,coordY)) {
-                return node;
+                n = node;
             }
         }
         return n;
+    }
+
+    public Arc findTouchArc(float x, float y){
+        Arc a = null;
+
+        for (Arc arc : graph.getArcs()) {
+            RectF bounds = new RectF();
+            arc.computeBounds(bounds,true);
+            if (bounds.contains(x,y)) {
+                a = arc;
+            }
+        }
+        imageView.invalidate();
+        return a;
     }
 
     private void initialiserGraph () {
         mode = Modes.NodeMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f + 10, nodeSize/2f + 10, "Noir", nodeSize));
+            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f, nodeSize/2f, "Noir", nodeSize));
         }
     }
 
@@ -211,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.context_menu_modify_node, menu);
         }
 
-        else if(arc != null && mode == Modes.EditMode) {
+        else if(currentArc != null && !hasTouchMoved && mode == Modes.EditMode) {
             getMenuInflater().inflate(R.menu.context_menu_modify_arc_menu, menu);
         }
 
@@ -336,6 +348,8 @@ public class MainActivity extends AppCompatActivity {
                         String value = taskEditText.getText().toString();
                         arc.setLabel(value);
                         update();
+                        arc = null;
+                        nodeTMP = null;
                     }
                 })
                 .create();
