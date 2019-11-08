@@ -3,6 +3,7 @@ package fr.istic.mob.graphLD;
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.view.ContextMenu;
@@ -298,26 +300,22 @@ public class MainActivity extends AppCompatActivity {
         imageView.setBackgroundColor(Color.WHITE);
         imageView.draw(c);
 
-        try {
-            File file = new File (getExternalFilesDir(null),"Graph.png");
-            FileOutputStream outputFile = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputFile);
-            outputFile.flush();
-            outputFile.close();
-            sendGraphByMail(file.getAbsolutePath());
-
-        }
-        catch (Exception e){
-            System.out.println("Erreur" +e);
-        }
+        String bitmapUrl = MediaStore.Images.Media.insertImage(
+                getContentResolver(),
+                bitmap,
+                "Graphe",
+                "Graph"
+        );
+        Uri uri = Uri.parse(bitmapUrl);
+        imageView.setImageURI(uri);
+        sendGraphByMail(uri);
     }
 
-    private void sendGraphByMail (String path) {
+    private void sendGraphByMail (Uri path) {
         Intent emailInt = new Intent(Intent.ACTION_SEND);
         emailInt.putExtra(Intent.EXTRA_SUBJECT, "Graphe");
         emailInt.setType("image/*");
-        Uri uri = Uri.parse(path);
-        emailInt.putExtra(Intent.EXTRA_STREAM, uri);
+        emailInt.putExtra(Intent.EXTRA_STREAM, path);
         startActivity(Intent.createChooser(emailInt,"Send graph"));
     }
 
