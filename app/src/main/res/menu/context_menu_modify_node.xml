@@ -13,5 +13,9 @@
     <item
         android:id="@+id/itemModifiyColor"
         android:title="@string/item_modify_node_color"/>
+    <item
+        android:id="@+id/itemModifyNodeLabelColor"
+        android:title="@string/item_modify_node_label_color">
+    </item>
 
 </menu>

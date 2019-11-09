@@ -3,11 +3,9 @@ package fr.istic.mob.graphLD;
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.view.ContextMenu;
@@ -25,10 +22,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,21 +49,19 @@ public class MainActivity extends AppCompatActivity {
     private float currentTouchX = 0;
     private float currentTouchY = 0;
 
-    Bitmap bitmap;
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null){
-            Graph retrievedGraph = (Graph) savedInstanceState.getSerializable("Graph");
-            graph = retrievedGraph;
+            graph = (Graph) savedInstanceState.getSerializable("Graph");
         }
 
         setContentView(R.layout.activity_main);
         imageView = findViewById(R.id.imageView);
         registerForContextMenu(imageView);
+        getSupportActionBar().setTitle(R.string.title_appli);
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -79,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 currentTouchY = motionEvent.getY();
 
                 Node touchNode = findTouchNode(x,y);
-                Arc touchArc = findTouchArc(x, y);
+                currentArc = findTouchArc(x, y);
 
                 if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
                     if (action == MotionEvent.ACTION_DOWN ) {
@@ -87,11 +83,11 @@ public class MainActivity extends AppCompatActivity {
                         currentNode = touchNode;
                     }
                     else if(action == MotionEvent.ACTION_MOVE && (xTouchVariation > SENSITIVE_MOVE || yTouchVariation > SENSITIVE_MOVE) && currentNode != null){
-                        if ((currentTouchX < imageViewWidth-nodeSize/2 && currentTouchY <imageViewHeight-nodeSize/2) && (currentTouchX> nodeSize/2 && y >nodeSize/2)) {
+                        if ((x< imageViewWidth-nodeSize/2 && y <imageViewHeight-nodeSize/2) && (x> nodeSize/2 && y >nodeSize/2)) {
                             hasTouchMoved = true;
 
-                            currentNode.setCoordX(currentTouchX);
-                            currentNode.setCoordY(currentTouchY);
+                            currentNode.setCoordX(x);
+                            currentNode.setCoordY(y);
                             for (Arc arc : graph.getArcs()) {
                                 if (arc.getNode1() == currentNode || arc.getNode2() == currentNode) {
                                     arc.reset();
@@ -105,20 +101,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-                else if((mode == Modes.NodeMode || mode == Modes.EditMode) && touchArc != null){
-                    currentArc = touchArc;
-                }
                 else if(touchNode == null){
                     currentNode = null;
-                }
-                else if(touchArc == null){
-                    currentArc = null;
                 }
 
                 if (mode == Modes.ArcMode) {
                     if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
-                        nodeTMP = new Node(x, y, "Noir", nodeSize);
+                        nodeTMP = new Node(x, y, nodeSize);
                         arc = new Arc(initialNode, nodeTMP);
                         graph.addArc(arc);
 
@@ -138,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
                         update();
                     }
-                    if (action == MotionEvent.ACTION_UP) {
+                    if (action == MotionEvent.ACTION_UP && arc != null) {
                         if (touchNode != null && nodeTMP != touchNode) {
                             graph.removeArc(arc);
                             arc = new Arc(initialNode, touchNode);
@@ -157,6 +147,25 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+              /*  if (mode == Modes.NodeMode) {
+                    long startTime = 0;
+                    long endTime = 0;
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        startTime = motionEvent.getEventTime();
+                    }
+                    else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        endTime = motionEvent.getEventTime();
+                    }
+                    else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                        endTime = 0;
+                    }
+                    if (endTime - startTime > 60000) {
+                        graph.addNode(new Node(x, y, nodeSize));
+                        update();
+                        startTime = 0;
+                        endTime = 0;
+                    }
+                }*/
                 return false;
             }
         });
@@ -209,10 +218,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initialiserGraph () {
-        mode = Modes.NodeMode;
+        mode = Modes.EditMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f, nodeSize/2f, "Noir", nodeSize));
+            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f, nodeSize/2f, nodeSize));
         }
     }
 
@@ -223,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.context_menu_modify_node, menu);
         }
 
-        else if(currentArc != null && !hasTouchMoved && mode == Modes.EditMode) {
+        else if(currentArc != null && mode == Modes.EditMode) {
             getMenuInflater().inflate(R.menu.context_menu_modify_arc_menu, menu);
         }
 
@@ -236,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
             this.graph.removeNodes(currentNode);
         }
         if (item.getItemId() == R.id.itemModifiyColor) {
-            showModifyNodeColorPopup(MainActivity.this);
+            showModifyColorPopup(MainActivity.this, "noeud");
         }
 
         if (item.getItemId() == R.id.itemModifiyLabel) {
@@ -247,24 +256,28 @@ public class MainActivity extends AppCompatActivity {
             showModifyNodeSizePopup (MainActivity.this);
         }
 
+        if (item.getItemId() == R.id.itemModifyNodeLabelColor) {
+            showModifyColorPopup(MainActivity.this, "labelNoeud");
+        }
+
         if (item.getItemId() == R.id.itemDeleteArc) {
-            this.graph.removeArc(arc);
+            this.graph.removeArc(currentArc);
         }
 
         if (item.getItemId() == R.id.itemModifiyArcColor) {
-
+            showModifyColorPopup(MainActivity.this, "arc");
         }
 
         if (item.getItemId() == R.id.itemModifiyArcLabel) {
-
+            showModifyArcLabelPopup(MainActivity.this);
         }
 
         if (item.getItemId() == R.id.itemModifiyArcLabelSize) {
-
+            showModifyArcLabelSizePopup(MainActivity.this);
         }
 
         if (item.getItemId() == R.id.itemModifiyArcThickness) {
-
+            showModifyArcThicknessPopup(MainActivity.this);
         }
 
         this.update();
@@ -289,8 +302,8 @@ public class MainActivity extends AppCompatActivity {
             update();
         }
         else if(itemID == R.id.addNodeModeButton){
-            graph.addNode(new Node(300, 300, "Noir", nodeSize));
-            update();
+           /* graph.addNode(new Node(300, 300, nodeSize));
+            update();*/
             mode = Modes.NodeMode;
         }
         else if(itemID == R.id.modeArcButton){
@@ -374,18 +387,44 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showModifyNodeColorPopup(final Context c) {
+    private void showModifyArcLabelPopup(final Context c) {
+        final EditText taskEditText = new EditText(c);
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_modify_arc_label_title)
+                .setMessage(R.string.popup_modify_arc_label_message)
+                .setView(taskEditText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String value = taskEditText.getText().toString();
+                        currentArc.setLabel(value);
+                        update();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showModifyColorPopup(final Context c, final String type) {
 
         final String [] colors = {getString(R.string.color_blue), getString(R.string.color_cyan), getString(R.string.color_green),
                 getString(R.string.color_noir), getString(R.string.color_magenta), getString(R.string.color_orange), getString(R.string.color_red)};
 
         AlertDialog.Builder popup = new AlertDialog.Builder(c);
         popup.setTitle(R.string.popup_modify_color_node_message);
-        int  itemChecked = 0;
+        int  itemChecked = -1;
         popup.setSingleChoiceItems(colors, itemChecked, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int index) {
-                currentNode.setColor(colors [index]);
+                if (type == "noeud") {
+                    currentNode.setColor(colors [index]);
+                }
+                else if (type == "labelNoeud") {
+                    currentNode.setLabelColor(colors[index]);
+                }
+                else if (type == "arc") {
+                    currentArc.setColor(colors [index]);
+                }
                 update();
             }
         });
@@ -414,8 +453,60 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             int value = Integer.parseInt(modifySizeText.getText().toString());
-                            if (value >= 50 && value <= 500) {
+                            if (value >= 50 && value <= 250) {
                                 currentNode.setNodeSize(value);
+                            }
+                            update();
+                        }
+                        catch(Exception e){}
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showModifyArcLabelSizePopup (Context c) {
+        final EditText modifySizeText = new EditText(c);
+        modifySizeText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        modifySizeText.setRawInputType(Configuration.KEYBOARD_12KEY);
+
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_modify_arc_label_size)
+                .setMessage(R.string.popup_modify_arc_size_label_message)
+                .setView(modifySizeText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            int value = Integer.parseInt(modifySizeText.getText().toString());
+                            if (value >= 20 && value <= 100) {
+                                currentArc.setLabelSize(value);
+                            }
+                            update();
+                        }
+                        catch(Exception e){}
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showModifyArcThicknessPopup (Context c) {
+        final EditText modifySizeText = new EditText(c);
+        modifySizeText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        modifySizeText.setRawInputType(Configuration.KEYBOARD_12KEY);
+
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.popup_modify_arc_thickness)
+                .setMessage(R.string.popup_modify_arc_thickness_message)
+                .setView(modifySizeText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            int value = Integer.parseInt(modifySizeText.getText().toString());
+                            if (value >= 1 && value <= 25) {
+                                currentArc.setThickness(value);
                             }
                             update();
                         }

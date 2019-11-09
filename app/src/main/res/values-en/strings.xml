@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GraphLD</string>
-    <string name="add_node_button">Add node mode</string>
+    <string name="add_node_button">Node mode</string>
     <string name="delete_button">Delete graph</string>
     <string name="edition_mode_button">Edit mode</string>
     <string name="item_delete_node">Delete node</string>
-    <string name="item_modify_node_color">Modify color</string>
-    <string name="item_modify_node_label">Modifiy label</string>
-    <string name="item_modify_node_size">Modify size</string>
+    <string name="item_modify_node_color">Modify node color</string>
+    <string name="item_modify_node_label">Modifiy node label</string>
+    <string name="item_modify_node_size">Modify node size</string>
     <string name="mode_arc_button">Arc mode</string>
     <string name="reset_button">Reset graph</string>
     <string name="popup_add_arc_message">Enter arc label</string>
@@ -22,13 +22,21 @@
     <string name="color_magenta">Magenta</string>
     <string name="color_orange">Orange</string>
     <string name="color_red">Red</string>
-    <string name="popup_modify_color_node_message">Choose new node color</string>
+    <string name="popup_modify_color_node_message">Choose a color</string>
     <string name="item_send_email">Send graph by name</string>
     <string name="item_delete_arc">Delete arc</string>
     <string name="item_modify_arc_color">Modify arc color</string>
     <string name="item_modify_arc_label">Modify arc label</string>
     <string name="item_modify_arc_thickness">Modify arc thickness</string>
     <string name="item_modify_label_arc_size">Modify arc label size</string>
-    <string name="popup_modify_node_size_message">Saisissez la nouvelle taille du noeud (entre 50 et 500)</string>
-    <string name="popup_modify_node_size">Modifiez la taille du noeud</string>
+    <string name="popup_modify_node_size_message">Write the new size of the node (between 50 and 250)</string>
+    <string name="popup_modify_node_size">Modify node size</string>
+    <string name="item_modify_node_label_color">Modify label color</string>
+    <string name="popup_modify_arc_label_message">Enter new arc label</string>
+    <string name="popup_modify_arc_label_title">Modifiy arc label</string>
+    <string name="popup_modify_arc_label_size">Modify label size</string>
+    <string name="popup_modify_arc_size_label_message">Enter label size (between 20 and 100)</string>
+    <string name="popup_modify_arc_thickness">Modify arc thickness</string>
+    <string name="popup_modify_arc_thickness_message">Enter arc thickness between 1 and 25</string>
+    <string name="title_appli">Graph Lebreton/Dubois</string>
 </resources>

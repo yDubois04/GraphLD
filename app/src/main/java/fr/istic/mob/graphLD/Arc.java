@@ -9,6 +9,9 @@ public class Arc extends Path  implements Serializable {
     private Node node1;
     private Node node2;
     private String label;
+    private String color;
+    private float thickness;
+    private float labelSize;
 
     public Arc (Node node1, Node node2) {
         super ();
@@ -16,6 +19,9 @@ public class Arc extends Path  implements Serializable {
         this.node2 = node2;
         this.moveTo(node1.getCoordX(),node1.getCoordY());
         this.lineTo(node2.getCoordX(),node2.getCoordY());
+        this.color = "Bleu";
+        this.labelSize = 30;
+        this.thickness = 8;
     }
 
     public Node getNode1() {
@@ -40,5 +46,29 @@ public class Arc extends Path  implements Serializable {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public float getThickness() {
+        return thickness;
+    }
+
+    public void setThickness(float labelThickness) {
+        this.thickness = labelThickness;
+    }
+
+    public float getLabelSize() {
+        return labelSize;
+    }
+
+    public void setLabelSize(float labelSize) {
+        this.labelSize = labelSize;
     }
 }

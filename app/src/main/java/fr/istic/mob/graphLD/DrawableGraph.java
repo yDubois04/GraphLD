@@ -21,16 +21,18 @@ public class DrawableGraph extends Drawable {
     private Graph graph;
     private Paint paintNode;
     private Paint paintArc;
-    private Paint paintText;
+    private Paint paintTextNode;
     private Context context;
+    private Paint paintTextArc;
 
 
     public DrawableGraph(Graph graph, Context context) {
         this.graph = graph;
         this.paintNode = new Paint ();
         this.paintArc = new Paint ();
-        this.paintText = new Paint ();
+        this.paintTextNode = new Paint ();
         this.context = context;
+        this.paintTextArc = new Paint();
 
         this.initPaint();
     }
@@ -42,36 +44,39 @@ public class DrawableGraph extends Drawable {
 
         for (Node node : graph.getNodes()) {
             if (node.getLabel() != null) {
-                float textSize = paintText.measureText(node.getLabel());
+                float textSize = paintTextNode.measureText(node.getLabel());
                 if (textSize > node.getNodeSize()) {
                     node.setNodeLength((int) textSize + node.getNodeSize());
                 }
             }
-            this.chooseNodeColor(node.getColor());
+            this.chooseColor(paintNode, node.getColor());
             canvas.drawRoundRect(node.left, node.top, node.right, node.bottom,50,50,paintNode);
 
             if (node.getLabel() != null) {
-                canvas.drawText(node.getLabel(), node.getCoordX() - node.getNodeLength()/2 + node.getNodeSize()/2, node.getCoordY(), paintText);
+                chooseColor(paintTextNode,node.getLabelColor());
+                canvas.drawText(node.getLabel(), node.getCoordX() - node.getNodeLength()/2 + node.getNodeSize()/2, node.getCoordY(), paintTextNode);
             }
         }
 
         for (Arc arc : graph.getArcs()) {
+            this.chooseColor(paintArc, arc.getColor());
+            paintArc.setStrokeWidth(arc.getThickness());
             canvas.drawPath(arc,paintArc);
             if (arc.getLabel() != null) {
                 middle = getArcMiddle(arc);
-                canvas.drawText(arc.getLabel(),middle[0]+10,middle[1],paintText);
+                paintTextArc.setTextSize(arc.getLabelSize());
+                canvas.drawText(arc.getLabel(),middle[0]+10,middle[1],paintTextArc);
             }
         }
     }
 
     private void initPaint () {
-        paintArc.setColor(Color.BLUE);
-        paintArc.setStrokeWidth(8);
         paintArc.setStyle(Paint.Style.STROKE);
 
-        paintText.setStyle(Paint.Style.FILL);
-        paintText.setColor(Color.BLACK);
-        paintText.setTextSize(30);
+        paintTextArc.setStyle(Paint.Style.FILL);
+
+        paintTextNode.setStyle(Paint.Style.FILL);
+        paintTextNode.setTextSize(30);
 
     }
 
@@ -84,31 +89,31 @@ public class DrawableGraph extends Drawable {
         return middle;
     }
 
-    private void chooseNodeColor (String color) {
+    private void chooseColor (Paint paint, String color) {
 
         if (color.equals(context.getString(R.string.color_red))) {
-            paintNode.setColor(Color.RED);
+            paint.setColor(Color.RED);
         }
         else if (color.equals(context.getString(R.string.color_green))) {
-            paintNode.setColor(Color.GREEN);
+            paint.setColor(Color.GREEN);
         }
         else if (color.equals(context.getString(R.string.color_blue))) {
-            paintNode.setColor(Color.BLUE);
+            paint.setColor(Color.BLUE);
         }
         else if (color.equals(context.getString(R.string.color_orange))) {
-           paintNode.setColor(Color.rgb(255,102,0));
+           paint.setColor(Color.rgb(255,102,0));
         }
         else if (color.equals(context.getString(R.string.color_cyan))) {
-            paintNode.setColor(Color.CYAN);
+            paint.setColor(Color.CYAN);
         }
         else if (color.equals(context.getString(R.string.color_magenta))) {
-            paintNode.setColor(Color.MAGENTA);
+            paint.setColor(Color.MAGENTA);
         }
         else if (color.equals(context.getString(R.string.color_noir))) {
-            paintNode.setColor(Color.BLACK);
+            paint.setColor(Color.BLACK);
         }
         else {
-            paintNode.setColor(Color.BLACK);
+            paint.setColor(Color.BLACK);
         }
     }
 

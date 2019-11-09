@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GraphLD</string>
-    <string name="add_node_button">Mode ajouter noeud</string>
+    <string name="add_node_button">Mode noeud</string>
     <string name="delete_button">Supprimer le graphe</string>
     <string name="edition_mode_button">Mode edition</string>
     <string name="item_delete_node">Supprimer le noeud</string>
-    <string name="item_modify_node_color">Modifier la couleur</string>
-    <string name="item_modify_node_label">Modifier l\'etiquette</string>
-    <string name="item_modify_node_size">Modifier la taille</string>
+    <string name="item_modify_node_color">Modifier la couleur du noeud</string>
+    <string name="item_modify_node_label">Modifier l\'etiquette du noeud</string>
+    <string name="item_modify_node_size">"Modifier la taille du noeud "</string>
     <string name="mode_arc_button">Mode arc</string>
     <string name="reset_button">Réinitialiser le graphe</string>
     <string name="popup_add_arc_message">Saisissez l\'étiquette de l\'arc</string>
@@ -22,13 +22,21 @@
     <string name="color_noir">Noir</string>
     <string name="color_orange">Orange</string>
     <string name="color_red">Rouge</string>
-    <string name="popup_modify_color_node_message">Choisissez la nouvelle couleur du noeud</string>
+    <string name="popup_modify_color_node_message">Choisissez une couleur</string>
     <string name="item_send_email">Envoyer le graphe par email</string>
     <string name="item_delete_arc">Supprimer l\'arc</string>
     <string name="item_modify_arc_color">Modifier la couleur de l\'arc</string>
     <string name="item_modify_arc_label">Modifier l\'étiquette de l\'arc</string>
     <string name="item_modify_arc_thickness">Modifier l\'épaisseur de l\'arc</string>
     <string name="item_modify_label_arc_size">Modifier la taille de l\'étiquette de l\'arc</string>
-    <string name="popup_modify_node_size_message">Write the new size of the node (between 50 and 500)</string>
-    <string name="popup_modify_node_size">Modify node size</string>
+    <string name="popup_modify_node_size">Modifier la taille du noeud</string>
+    <string name="item_modify_node_label_color">Modifier la couleur de l\'étiquette</string>
+    <string name="popup_modify_arc_label_message">Saisissez la nouvelle étiquette de l\'arc</string>
+    <string name="popup_modify_arc_label_title">Modifier l\'étiquette de l\'arc</string>
+    <string name="popup_modify_arc_size_label_message">Saisissez la taille de l\'étiquette (entre 20 et 100)</string>
+    <string name="popup_modify_arc_label_size">Modifier la taille de l\'étiquette</string>
+    <string name="popup_modify_arc_thickness">Modifier l\'épaisseur de l\'arc</string>
+    <string name="popup_modify_arc_thickness_message">Saisissez une épaisseur pour l\'arc entre 1 et 25</string>
+    <string name="popup_modify_node_size_message">Saisissez la nouvelle taille du noeud (entre 50 et 250)</string>
+    <string name="title_appli">Graph Lebreton/Dubois</string>
 </resources>
