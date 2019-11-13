@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GraphLD</string>
-    <string name="add_node_button">Node mode</string>
+    <string name="node_mode">Node mode</string>
     <string name="delete_button">Delete graph</string>
     <string name="edition_mode_button">Edit mode</string>
     <string name="item_delete_node">Delete node</string>
@@ -14,7 +14,7 @@
     <string name="popup_validate">Validate</string>
     <string name="popup_add_arc_title">Add arc</string>
     <string name="popup_modify_label_node">Modify node label</string>
-    <string name="popup_modify_label_node_message">Enter new node label</string>
+    <string name="popup_modify_label_node_message">Enter node label</string>
     <string name="color_noir">Black</string>
     <string name="color_blue">Blue</string>
     <string name="color_cyan">Cyan</string>
@@ -23,7 +23,7 @@
     <string name="color_orange">Orange</string>
     <string name="color_red">Red</string>
     <string name="popup_modify_color_node_message">Choose a color</string>
-    <string name="item_send_email">Send graph by name</string>
+    <string name="item_send_email">Send graph by email</string>
     <string name="item_delete_arc">Delete arc</string>
     <string name="item_modify_arc_color">Modify arc color</string>
     <string name="item_modify_arc_label">Modify arc label</string>
@@ -39,4 +39,7 @@
     <string name="popup_modify_arc_thickness">Modify arc thickness</string>
     <string name="popup_modify_arc_thickness_message">Enter arc thickness between 1 and 25</string>
     <string name="title_appli">Graph Lebreton/Dubois</string>
+    <string name="add_node_menu">Add new node</string>
+    <string name="title_graph">Graph</string>
+    <string name="graph_description">New graph</string>
 </resources>

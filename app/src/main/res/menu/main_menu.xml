@@ -2,14 +2,8 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/resetButton"
-        android:title="@string/reset_button" />
-    <item
-        android:id="@+id/delButton"
-        android:title="@string/delete_button" />
-    <item
         android:id="@+id/addNodeModeButton"
-        android:title="@string/add_node_button" />
+        android:title="@string/node_mode"/>
     <item
         android:id="@+id/modeArcButton"
         android:title="@string/mode_arc_button" />
@@ -17,7 +11,15 @@
     <item
         android:id="@+id/modeEditButton"
         android:title="@string/edition_mode_button" />
+
     <item
         android:id="@+id/sendGraphByEmail"
         android:title="@string/item_send_email" />
+
+    <item
+        android:id="@+id/resetButton"
+        android:title="@string/reset_button" />
+    <item
+        android:id="@+id/delButton"
+        android:title="@string/delete_button" />
 </menu>

@@ -10,7 +10,9 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.Region;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,11 +24,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -103,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if(touchNode == null){
                     currentNode = null;
+                    hasTouchMoved = false;
                 }
 
                 if (mode == Modes.ArcMode) {
@@ -118,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
                         update();
                     }
-                    if (action == MotionEvent.ACTION_MOVE && nodeTMP != null) {
+                    if (action == MotionEvent.ACTION_MOVE && nodeTMP != null && arc != null) {
                         nodeTMP.setCoordX(x);
                         nodeTMP.setCoordY(y);
 
@@ -147,25 +145,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-              /*  if (mode == Modes.NodeMode) {
-                    long startTime = 0;
-                    long endTime = 0;
-                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                        startTime = motionEvent.getEventTime();
-                    }
-                    else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        endTime = motionEvent.getEventTime();
-                    }
-                    else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                        endTime = 0;
-                    }
-                    if (endTime - startTime > 60000) {
-                        graph.addNode(new Node(x, y, nodeSize));
-                        update();
-                        startTime = 0;
-                        endTime = 0;
-                    }
-                }*/
                 return false;
             }
         });
@@ -209,11 +188,11 @@ public class MainActivity extends AppCompatActivity {
         for (Arc arc : graph.getArcs()) {
             RectF bounds = new RectF();
             arc.computeBounds(bounds,true);
+            imageView.invalidate();
             if (bounds.contains(x,y)) {
                 a = arc;
             }
         }
-        imageView.invalidate();
         return a;
     }
 
@@ -236,6 +215,10 @@ public class MainActivity extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.context_menu_modify_arc_menu, menu);
         }
 
+        else if (mode == Modes.NodeMode && !hasTouchMoved) {
+            getMenuInflater().inflate(R.menu.add_node_menu, menu);
+        }
+
     }
 
     @Override
@@ -245,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             this.graph.removeNodes(currentNode);
         }
         if (item.getItemId() == R.id.itemModifiyColor) {
-            showModifyColorPopup(MainActivity.this, "noeud");
+            showModifyColorPopup(MainActivity.this, "Node");
         }
 
         if (item.getItemId() == R.id.itemModifiyLabel) {
@@ -257,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (item.getItemId() == R.id.itemModifyNodeLabelColor) {
-            showModifyColorPopup(MainActivity.this, "labelNoeud");
+            showModifyColorPopup(MainActivity.this, "NodeLabel");
         }
 
         if (item.getItemId() == R.id.itemDeleteArc) {
@@ -265,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (item.getItemId() == R.id.itemModifiyArcColor) {
-            showModifyColorPopup(MainActivity.this, "arc");
+            showModifyColorPopup(MainActivity.this, "Arc");
         }
 
         if (item.getItemId() == R.id.itemModifiyArcLabel) {
@@ -278,6 +261,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (item.getItemId() == R.id.itemModifiyArcThickness) {
             showModifyArcThicknessPopup(MainActivity.this);
+        }
+        if (item.getItemId() == R.id.addNewNode) {
+            showAddNodeDialog(MainActivity.this);
         }
 
         this.update();
@@ -302,8 +288,6 @@ public class MainActivity extends AppCompatActivity {
             update();
         }
         else if(itemID == R.id.addNodeModeButton){
-           /* graph.addNode(new Node(300, 300, nodeSize));
-            update();*/
             mode = Modes.NodeMode;
         }
         else if(itemID == R.id.modeArcButton){
@@ -328,8 +312,8 @@ public class MainActivity extends AppCompatActivity {
         String bitmapUrl = MediaStore.Images.Media.insertImage(
                 getContentResolver(),
                 bitmap,
-                "Graphe",
-                "Graph"
+                getString(R.string.title_graph),
+                getString(R.string.graph_description)
         );
         Uri uri = Uri.parse(bitmapUrl);
         imageView.setImageURI(uri);
@@ -338,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendGraphByMail (Uri path) {
         Intent emailInt = new Intent(Intent.ACTION_SEND);
-        emailInt.putExtra(Intent.EXTRA_SUBJECT, "Graphe");
+        emailInt.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.title_graph));
         emailInt.setType("image/*");
         emailInt.putExtra(Intent.EXTRA_STREAM, path);
         startActivity(Intent.createChooser(emailInt,"Send graph"));
@@ -347,6 +331,26 @@ public class MainActivity extends AppCompatActivity {
     private void update(){
         drawableGraph = new DrawableGraph(graph, getApplicationContext());
         imageView.setImageDrawable(drawableGraph);
+    }
+
+    private void showAddNodeDialog(final Context c) {
+        final EditText taskEditText = new EditText(c);
+        final AlertDialog dialog = new AlertDialog.Builder(c)
+                .setTitle(R.string.add_node_menu)
+                .setMessage(R.string.popup_modify_label_node_message)
+                .setView(taskEditText)
+                .setPositiveButton(R.string.popup_validate, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String value = taskEditText.getText().toString();
+                        Node node = new Node (currentTouchX, currentTouchY, nodeSize);
+                        node.setLabel(value);
+                        graph.addNode(node);
+                        update();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 
     private void showAddArcItemDialog(final Context c) {
@@ -416,13 +420,13 @@ public class MainActivity extends AppCompatActivity {
         popup.setSingleChoiceItems(colors, itemChecked, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int index) {
-                if (type == "noeud") {
+                if (type == "Node") {
                     currentNode.setColor(colors [index]);
                 }
-                else if (type == "labelNoeud") {
+                else if (type == "NodeLabel") {
                     currentNode.setLabelColor(colors[index]);
                 }
-                else if (type == "arc") {
+                else if (type == "Arc") {
                     currentArc.setColor(colors [index]);
                 }
                 update();

@@ -20,8 +20,9 @@ public class Node extends RectF  implements Serializable {
         this.coordY = coordY;
         this.color = "Noir";
         this.nodeSize = newNodeSize;
-        nodeLength = nodeSize;
+        this.nodeLength = nodeSize;
         this.labelColor = "Bleu";
+        this.label = "";
     }
 
     public float getCoordX() {
