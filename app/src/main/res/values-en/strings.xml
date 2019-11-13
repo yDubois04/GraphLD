@@ -42,4 +42,6 @@
     <string name="add_node_menu">Add new node</string>
     <string name="title_graph">Graph</string>
     <string name="graph_description">New graph</string>
+    <string name="display_graph">Display save graph</string>
+    <string name="save_graph">Save graph</string>
 </resources>

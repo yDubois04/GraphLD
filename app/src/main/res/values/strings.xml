@@ -41,4 +41,6 @@
     <string name="add_node_menu">Ajouter un nouveau noeud</string>
     <string name="title_graph">Graphe</string>
     <string name="graph_description">Nouveau graphe</string>
+    <string name="save_graph">Sauvegarder le graphe</string>
+    <string name="display_graph">Afficher le graphe sauvegardé</string>
 </resources>

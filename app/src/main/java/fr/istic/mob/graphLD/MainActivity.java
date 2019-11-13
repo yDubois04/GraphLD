@@ -15,6 +15,7 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.view.ContextMenu;
@@ -24,6 +25,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -91,8 +99,9 @@ public class MainActivity extends AppCompatActivity {
                                     Node node1 = arc.getNode1();
                                     Node node2 = arc.getNode2();
                                     arc.moveTo(node1.getCoordX(), node1.getCoordY());
-                                    arc.quadTo(Math.abs(node1.getCoordX() - node2.getCoordX()), Math.abs(node1.getCoordY() - node2.getCoordY()), node2.getCoordX(), node2.getCoordY());
-                                    //arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                                    //arc.quadTo(node2.getCoordX(), node2.getCoordX()/2, node2.getCoordX(), node2.getCoordY());
+                                  //  arc.quadTo(Math.abs(node1.getCoordX() - node2.getCoordX()), Math.abs(node1.getCoordY() - node2.getCoordY()), node2.getCoordX(), node2.getCoordY());
+                                    arc.lineTo(node2.getCoordX(), node2.getCoordY());
                                 }
                             }
                             update();
@@ -189,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         for (Arc arc : graph.getArcs()) {
             RectF bounds = new RectF();
             arc.computeBounds(bounds,true);
+            System.out.println("bottom "+bounds.bottom+" top "+bounds.top+" left "+bounds.left+ " right "+bounds.right);
             imageView.invalidate();
             if (bounds.contains(x,y)) {
                 a = arc;
@@ -297,14 +307,45 @@ public class MainActivity extends AppCompatActivity {
         else if(itemID == R.id.modeEditButton){
             mode = Modes.EditMode;
         }
-        else if (itemID == R.id.sendGraphByEmail) {
-          saveGraph();
+        else if (itemID == R.id.sendGraphByEmailButton) {
+          saveGraphInBitmap();
+        }
+        else if (itemID == R.id.saveGraphButton) {
+            saveGraphInMemory();
+        }
+        else if (itemID == R.id.displayGraphButton) {
+           displayGraph();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveGraph () {
+    private void saveGraphInMemory () {
+        FileOutputStream outputStream = null;
+        ObjectOutputStream objectOutputStream = null;
+        String nameFile = "graph.txt";
+        try {
+            outputStream = openFileOutput(nameFile, MODE_PRIVATE);
+            objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(graph);
+        } catch (IOException e) {
+            System.out.println("Erreur ! : " + e);
+        }
+    }
+
+    private void displayGraph () {
+        try {
+            FileInputStream input = openFileInput("graph.txt");
+            ObjectInputStream inputStream = new ObjectInputStream(input);
+            graph = (Graph) inputStream.readObject();
+            update();
+        }
+        catch (Exception e) {
+            System.out.println("Erreur ! : " +e);
+        }
+    }
+
+    private void saveGraphInBitmap () {
         Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);
         imageView.setBackgroundColor(Color.WHITE);
@@ -334,6 +375,15 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageDrawable(drawableGraph);
     }
 
+
+    /***
+     *
+     *
+     * Define application popup
+     *
+     *
+     */
+
     private void showAddNodeDialog(final Context c) {
         final EditText taskEditText = new EditText(c);
         final AlertDialog dialog = new AlertDialog.Builder(c)
@@ -344,7 +394,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String value = taskEditText.getText().toString();
-                        Node node = new Node (currentTouchX, currentTouchY, nodeSize);
+                        Node node = new Node (currentTouchX, currentTouchY, initialNodeSize);
                         node.setLabel(value);
                         graph.addNode(node);
                         update();
