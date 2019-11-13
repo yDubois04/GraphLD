@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     int imageViewHeight, imageViewWidth;
     Modes mode;
-    private int nodeSize = 0;
+    private int initialNodeSize;
 
     Node initialNode = null;
     Node nodeTMP = null;
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         currentNode = touchNode;
                     }
                     else if(action == MotionEvent.ACTION_MOVE && (xTouchVariation > SENSITIVE_MOVE || yTouchVariation > SENSITIVE_MOVE) && currentNode != null){
-                        if ((x< imageViewWidth-nodeSize/2 && y <imageViewHeight-nodeSize/2) && (x> nodeSize/2 && y >nodeSize/2)) {
+                        if ((x< imageViewWidth-currentNode.getNodeSize()/2 && y <imageViewHeight-currentNode.getNodeSize()/2) && (x> currentNode.getNodeSize()/2 && y > currentNode.getNodeSize()/2)) {
                             hasTouchMoved = true;
 
                             currentNode.setCoordX(x);
@@ -91,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
                                     Node node1 = arc.getNode1();
                                     Node node2 = arc.getNode2();
                                     arc.moveTo(node1.getCoordX(), node1.getCoordY());
-                                    arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                                    arc.quadTo(Math.abs(node1.getCoordX() - node2.getCoordX()), Math.abs(node1.getCoordY() - node2.getCoordY()), node2.getCoordX(), node2.getCoordY());
+                                    //arc.lineTo(node2.getCoordX(), node2.getCoordY());
                                 }
                             }
                             update();
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 if (mode == Modes.ArcMode) {
                     if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
-                        nodeTMP = new Node(x, y, nodeSize);
+                        nodeTMP = new Node(x, y, initialNodeSize);
                         arc = new Arc(initialNode, nodeTMP);
                         graph.addArc(arc);
 
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 imageViewWidth = imageView.getWidth();
                 imageViewHeight = imageView.getHeight();
 
-                nodeSize = imageViewWidth/12;
+                initialNodeSize = imageViewWidth/12;
 
                 if (graph == null){
                     initialiserGraph();
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         mode = Modes.EditMode;
         graph = new Graph();
         for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node(imageViewWidth/9f * i + nodeSize/2f, nodeSize/2f, nodeSize));
+            graph.getNodes().add(new Node(imageViewWidth/9f * i + initialNodeSize/2f, initialNodeSize/2f, initialNodeSize));
         }
     }
 
