@@ -1,6 +1,5 @@
 package fr.istic.mob.graphLD;
 
-import fr.istic.mob.graphLD.R;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,7 +7,6 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
@@ -45,8 +43,10 @@ public class DrawableGraph extends Drawable {
         for (Node node : graph.getNodes()) {
             if (node.getLabel() != null) {
                 float textSize = paintTextNode.measureText(node.getLabel());
-                if (textSize > node.getNodeSize()) {
-                    node.setNodeLength((int) textSize + node.getNodeSize());
+                if (textSize * 1.2 > node.getNodeSize()) {
+                    node.setNodeLength((int) (textSize * 1.2));
+                }else{
+                    node.setNodeSize((int) (node.getNodeSize()));
                 }
             }
             this.chooseColor(paintNode, node.getColor());
@@ -54,7 +54,7 @@ public class DrawableGraph extends Drawable {
 
             if (node.getLabel() != null) {
                 chooseColor(paintTextNode,node.getLabelColor());
-                canvas.drawText(node.getLabel(), node.getCoordX() - node.getNodeLength()/2 + node.getNodeSize()/2, node.getCoordY(), paintTextNode);
+                canvas.drawText(node.getLabel(), node.getCoordX() - node.getNodeLength()/2 + node.getNodeLength() * 0.1f, node.getCoordY(), paintTextNode);
             }
         }
 
