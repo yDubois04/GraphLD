@@ -338,6 +338,10 @@ public class MainActivity extends AppCompatActivity {
             FileInputStream input = openFileInput("graph.txt");
             ObjectInputStream inputStream = new ObjectInputStream(input);
             graph = (Graph) inputStream.readObject();
+            for (Arc arc : graph.getArcs()) {
+                arc.moveTo(arc.getNode1().getCoordX(), arc.getNode1().getCoordY());
+                arc.lineTo(arc.getNode2().getCoordX(), arc.getNode2().getCoordY());
+            }
             update();
         }
         catch (Exception e) {
