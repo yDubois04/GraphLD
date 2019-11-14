@@ -14,6 +14,9 @@ public class Node extends RectF  implements Serializable {
     private String label;
     private String labelColor;
 
+    //coordX & coordY are the coordinate of the center of the node, newNodeSize is the diameter of the node
+    //we set left, right, top and bottom at + or - newNodeSize/2 as it represent the radius of the Node,
+    //hence the limit of the node must be 1 radius away from the coordinate
     public Node(float coordX, float coordY, int newNodeSize) {
         super(coordX-newNodeSize/2,coordY-newNodeSize/2,coordX+newNodeSize/2,coordY+newNodeSize/2);
         this.coordX = coordX;

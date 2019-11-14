@@ -10,12 +10,9 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.RectF;
-import android.graphics.Region;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.view.ContextMenu;
@@ -26,7 +23,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,29 +31,36 @@ import java.io.ObjectOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Major variables
     private DrawableGraph drawableGraph;
+    private ImageView imageView;
     private Graph graph;
-    ImageView imageView;
-    int imageViewHeight, imageViewWidth;
-    Modes mode;
-    private int initialNodeSize;
+    private Modes mode;
 
-    Node initialNode = null;
-    Node nodeTMP = null;
-    Arc arc = null;
+    //Run time variables
+    private boolean hasTouchMoved = false;
+    private Node currentNode = null;
+    private Arc currentArc = null;
 
-    Node currentNode = null;
-    Arc currentArc = null;
-    boolean hasTouchMoved = false;
-
+    //Screen sensitivity variables
     final float SENSITIVE_MOVE = 2f;
     private float currentTouchX = 0;
     private float currentTouchY = 0;
+
+    int imageViewHeight, imageViewWidth;
+    private int initialNodeSize;
+
+    //Used to create arc
+    private Node initialNode = null;
+    private Node nodeTMP = null;
+    private Arc arc = null;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         if (savedInstanceState != null){
             graph = (Graph) savedInstanceState.getSerializable("Graph");
@@ -92,8 +95,11 @@ public class MainActivity extends AppCompatActivity {
                         if ((x< imageViewWidth-currentNode.getNodeSize()/2 && y <imageViewHeight-currentNode.getNodeSize()/2) && (x> currentNode.getNodeSize()/2 && y > currentNode.getNodeSize()/2)) {
                             hasTouchMoved = true;
 
+                            //moving currentNode
                             currentNode.setCoordX(x);
                             currentNode.setCoordY(y);
+
+                            //moving all arcs related to currentNode
                             for (Arc arc : graph.getArcs()) {
                                 if (arc.getNode1() == currentNode || arc.getNode2() == currentNode) {
                                     arc.reset();

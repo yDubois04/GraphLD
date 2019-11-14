@@ -40,6 +40,7 @@ public class DrawableGraph extends Drawable {
     public void draw(@NonNull Canvas canvas) {
         float [] middle;
 
+        //dracing nodes
         for (Node node : graph.getNodes()) {
             if (node.getLabel() != null) {
                 float textSize = paintTextNode.measureText(node.getLabel());
@@ -58,6 +59,7 @@ public class DrawableGraph extends Drawable {
             }
         }
 
+        //drawing arcs
         for (Arc arc : graph.getArcs()) {
             this.chooseColor(paintArc, arc.getColor());
             paintArc.setStrokeWidth(arc.getThickness());
