@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PathMeasure;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 currentTouchY = motionEvent.getY();
 
                 Node touchNode = findTouchNode(x,y);
-                currentArc = findTouchArc(x, y);
+                currentArc = findTouchMiddleArc(x, y);
 
                 //Move node
                 if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
@@ -320,19 +321,26 @@ public class MainActivity extends AppCompatActivity {
         return n;
     }
 
-    public Arc findTouchArc(float x, float y){
+    public Arc findTouchMiddleArc(float x, float y){
         Arc a = null;
 
         for (Arc arc : graph.getArcs()) {
-            RectF bounds = new RectF();
-            arc.computeBounds(bounds,true);
-            System.out.println("bottom "+bounds.bottom+" top "+bounds.top+" left "+bounds.left+ " right "+bounds.right);
-            imageView.invalidate();
+            float [] middle = getArcMiddle(arc);
+            RectF bounds = new RectF(middle [0] -50, middle[1]-50, middle[0]+50, middle[1]+50);
             if (bounds.contains(x,y)) {
                 a = arc;
             }
         }
         return a;
+    }
+
+    private float[] getArcMiddle (Arc arc) {
+        float [] middle = {0f, 0f};
+        float [] tangent = {0f, 0f};
+        PathMeasure measure = new PathMeasure (arc, false);
+        measure.getPosTan(measure.getLength() * 0.5f, middle,tangent);
+
+        return middle;
     }
 
     private void initialiserGraph () {
