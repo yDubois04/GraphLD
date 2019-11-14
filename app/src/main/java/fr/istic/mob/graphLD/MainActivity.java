@@ -99,8 +99,7 @@ public class MainActivity extends AppCompatActivity {
                                     Node node1 = arc.getNode1();
                                     Node node2 = arc.getNode2();
                                     arc.moveTo(node1.getCoordX(), node1.getCoordY());
-                                    //arc.quadTo(node2.getCoordX(), node2.getCoordX()/2, node2.getCoordX(), node2.getCoordY());
-                                  //  arc.quadTo(Math.abs(node1.getCoordX() - node2.getCoordX()), Math.abs(node1.getCoordY() - node2.getCoordY()), node2.getCoordX(), node2.getCoordY());
+                                    //arc.quadTo(Math.abs(node1.getCoordX() - node2.getCoordX()), Math.abs(node1.getCoordY() - node2.getCoordY()), node2.getCoordX(), node2.getCoordY());
                                     arc.lineTo(node2.getCoordX(), node2.getCoordY());
                                 }
                             }
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.context_menu_modify_node, menu);
         }
 
-        else if(currentArc != null && mode == Modes.EditMode) {
+        else if(currentArc != null && !hasTouchMoved && mode == Modes.EditMode) {
             getMenuInflater().inflate(R.menu.context_menu_modify_arc_menu, menu);
         }
 
