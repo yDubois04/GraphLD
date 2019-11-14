@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 Node touchNode = findTouchNode(x,y);
                 currentArc = findTouchArc(x, y);
 
+                //Move node
                 if ((mode == Modes.NodeMode || mode == Modes.EditMode) && touchNode != null) {
                     if (action == MotionEvent.ACTION_DOWN ) {
                         hasTouchMoved = false;
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     hasTouchMoved = false;
                 }
 
+                //Arc creation
                 if (mode == Modes.ArcMode) {
                     if (action == MotionEvent.ACTION_DOWN && touchNode != null) {
                         initialNode = touchNode;
@@ -180,39 +182,13 @@ public class MainActivity extends AppCompatActivity {
         outState.putSerializable("Graph", graph);
     }
 
-    public Node findTouchNode (float coordX, float coordY) {
-        Node n = null;
-
-        for (Node node : graph.getNodes()) {
-            if (node.contains(coordX,coordY)) {
-                n = node;
-            }
-        }
-        return n;
-    }
-
-    public Arc findTouchArc(float x, float y){
-        Arc a = null;
-
-        for (Arc arc : graph.getArcs()) {
-            RectF bounds = new RectF();
-            arc.computeBounds(bounds,true);
-            System.out.println("bottom "+bounds.bottom+" top "+bounds.top+" left "+bounds.left+ " right "+bounds.right);
-            imageView.invalidate();
-            if (bounds.contains(x,y)) {
-                a = arc;
-            }
-        }
-        return a;
-    }
-
-    private void initialiserGraph () {
-        mode = Modes.EditMode;
-        graph = new Graph();
-        for (int i = 0; i < 9; i++) {
-            graph.getNodes().add(new Node(imageViewWidth/9f * i + initialNodeSize/2f, initialNodeSize/2f, initialNodeSize));
-        }
-    }
+    /**
+     *
+     *
+     * MENUS
+     *
+     *
+     */
 
     @Override
     public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -319,6 +295,48 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     *
+     *
+     * OUR FONCTIONS
+     *
+     *
+     */
+
+    public Node findTouchNode (float coordX, float coordY) {
+        Node n = null;
+
+        for (Node node : graph.getNodes()) {
+            if (node.contains(coordX,coordY)) {
+                n = node;
+            }
+        }
+        return n;
+    }
+
+    public Arc findTouchArc(float x, float y){
+        Arc a = null;
+
+        for (Arc arc : graph.getArcs()) {
+            RectF bounds = new RectF();
+            arc.computeBounds(bounds,true);
+            System.out.println("bottom "+bounds.bottom+" top "+bounds.top+" left "+bounds.left+ " right "+bounds.right);
+            imageView.invalidate();
+            if (bounds.contains(x,y)) {
+                a = arc;
+            }
+        }
+        return a;
+    }
+
+    private void initialiserGraph () {
+        mode = Modes.EditMode;
+        graph = new Graph();
+        for (int i = 0; i < 9; i++) {
+            graph.getNodes().add(new Node(imageViewWidth/9f * i + initialNodeSize/2f, initialNodeSize/2f, initialNodeSize));
+        }
+    }
+
     private void saveGraphInMemory () {
         FileOutputStream outputStream = null;
         ObjectOutputStream objectOutputStream = null;
@@ -327,6 +345,10 @@ public class MainActivity extends AppCompatActivity {
             outputStream = openFileOutput(nameFile, MODE_PRIVATE);
             objectOutputStream = new ObjectOutputStream(outputStream);
             objectOutputStream.writeObject(graph);
+            outputStream.flush();
+            outputStream.close();
+            objectOutputStream.flush();
+            objectOutputStream.close();
         } catch (IOException e) {
             System.out.println("Erreur ! : " + e);
         }
@@ -382,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
     /***
      *
      *
-     * Define application popup
+     * APPLICATION POPUPS
      *
      *
      */
@@ -437,8 +459,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String value = taskEditText.getText().toString();
-                        currentNode.setLabel(value);
-                        update();
+                        if (currentNode != null) {
+                            currentNode.setLabel(value);
+                            update();
+                        }
                     }
                 })
                 .create();
@@ -455,8 +479,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String value = taskEditText.getText().toString();
-                        currentArc.setLabel(value);
-                        update();
+                        if (currentArc != null) {
+                            currentArc.setLabel(value);
+                            update();
+                        }
                     }
                 })
                 .create();
@@ -474,13 +500,13 @@ public class MainActivity extends AppCompatActivity {
         popup.setSingleChoiceItems(colors, itemChecked, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int index) {
-                if (type == "Node") {
+                if (type == "Node" && currentNode!= null) {
                     currentNode.setColor(colors [index]);
                 }
-                else if (type == "NodeLabel") {
+                else if (type == "NodeLabel" && currentNode != null) {
                     currentNode.setLabelColor(colors[index]);
                 }
-                else if (type == "Arc") {
+                else if (type == "Arc" && currentArc != null) {
                     currentArc.setColor(colors [index]);
                 }
                 update();
@@ -511,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             int value = Integer.parseInt(modifySizeText.getText().toString());
-                            if (value >= 50 && value <= 250) {
+                            if (value >= 50 && value <= 250 && currentNode != null) {
                                 currentNode.setNodeSize(value);
                             }
                             update();
@@ -537,7 +563,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             int value = Integer.parseInt(modifySizeText.getText().toString());
-                            if (value >= 20 && value <= 100) {
+                            if (value >= 20 && value <= 100 && currentArc != null) {
                                 currentArc.setLabelSize(value);
                             }
                             update();
@@ -563,7 +589,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             int value = Integer.parseInt(modifySizeText.getText().toString());
-                            if (value >= 1 && value <= 25) {
+                            if (value >= 1 && value <= 25 && currentArc != null) {
                                 currentArc.setThickness(value);
                             }
                             update();
