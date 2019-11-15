@@ -17,17 +17,17 @@
         android:title="@string/item_send_email" />
 
     <item
-        android:id="@+id/resetButton"
-        android:title="@string/reset_button" />
-    <item
-        android:id="@+id/delButton"
-        android:title="@string/delete_button" />
-
-    <item
         android:id="@+id/saveGraphButton"
         android:title="@string/save_graph"/>
 
     <item
         android:id="@+id/displayGraphButton"
         android:title="@string/display_graph" />
+
+    <item
+        android:id="@+id/resetButton"
+        android:title="@string/reset_button" />
+    <item
+        android:id="@+id/delButton"
+        android:title="@string/delete_button" />
 </menu>
