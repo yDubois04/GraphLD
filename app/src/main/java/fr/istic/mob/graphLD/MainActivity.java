@@ -103,12 +103,7 @@ public class MainActivity extends AppCompatActivity {
                             //moving all arcs related to currentNode
                             for (Arc arc : graph.getArcs()) {
                                 if (arc.getNode1() == currentNode || arc.getNode2() == currentNode) {
-                                    arc.reset();
-                                    Node node1 = arc.getNode1();
-                                    Node node2 = arc.getNode2();
-                                    arc.moveTo(node1.getCoordX(), node1.getCoordY());
-                                    //arc.quadTo(Math.abs(node1.getCoordX() - node2.getCoordX()), Math.abs(node1.getCoordY() - node2.getCoordY()), node2.getCoordX(), node2.getCoordY());
-                                    arc.lineTo(node2.getCoordX(), node2.getCoordY());
+                                    arc.reset ();
                                 }
                             }
                             update();
@@ -127,21 +122,13 @@ public class MainActivity extends AppCompatActivity {
                         nodeTMP = new Node(x, y, initialNodeSize);
                         arc = new Arc(initialNode, nodeTMP);
                         graph.addArc(arc);
-
                         arc.reset();
-                        arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
-                        arc.lineTo(nodeTMP.getCoordX(), nodeTMP.getCoordY());
-
                         update();
                     }
                     if (action == MotionEvent.ACTION_MOVE && nodeTMP != null && arc != null) {
                         nodeTMP.setCoordX(x);
                         nodeTMP.setCoordY(y);
-
                         arc.reset();
-                        arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
-                        arc.lineTo(nodeTMP.getCoordX(), nodeTMP.getCoordY());
-
                         update();
                     }
                     if (action == MotionEvent.ACTION_UP && arc != null) {
@@ -149,11 +136,7 @@ public class MainActivity extends AppCompatActivity {
                             graph.removeArc(arc);
                             arc = new Arc(initialNode, touchNode);
                             graph.addArc(arc);
-
                             arc.reset();
-                            arc.moveTo(initialNode.getCoordX(), initialNode.getCoordY());
-                            arc.lineTo(touchNode.getCoordX(), touchNode.getCoordY());
-
                             showAddArcItemDialog(MainActivity.this);
                             update();
                         } else {
@@ -373,10 +356,6 @@ public class MainActivity extends AppCompatActivity {
             FileInputStream input = openFileInput("graph.txt");
             ObjectInputStream inputStream = new ObjectInputStream(input);
             graph = (Graph) inputStream.readObject();
-            for (Arc arc : graph.getArcs()) {
-                arc.moveTo(arc.getNode1().getCoordX(), arc.getNode1().getCoordY());
-                arc.lineTo(arc.getNode2().getCoordX(), arc.getNode2().getCoordY());
-            }
             update();
         }
         catch (Exception e) {

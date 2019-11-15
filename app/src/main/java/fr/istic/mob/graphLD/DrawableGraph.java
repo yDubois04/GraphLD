@@ -63,9 +63,14 @@ public class DrawableGraph extends Drawable {
         for (Arc arc : graph.getArcs()) {
             this.chooseColor(paintArc, arc.getColor());
             paintArc.setStrokeWidth(arc.getThickness());
-            System.out.println(arc.getNode1().getCoordX());
-            System.out.println(arc.getLabel());
+
+            Node node1 = arc.getNode1();
+            Node node2 = arc.getNode2();
+            arc.moveTo(node1.getCoordX(), node1.getCoordY());
+            arc.lineTo(node2.getCoordX(), node2.getCoordY());
+
             canvas.drawPath(arc,paintArc);
+
             if (arc.getLabel() != null) {
                 middle = getArcMiddle(arc);
                 paintTextArc.setTextSize(arc.getLabelSize());

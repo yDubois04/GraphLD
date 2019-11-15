@@ -17,8 +17,6 @@ public class Arc extends Path  implements Serializable {
         super ();
         this.node1 = node1;
         this.node2 = node2;
-        this.moveTo(node1.getCoordX(),node1.getCoordY());
-        this.lineTo(node2.getCoordX(),node2.getCoordY());
         this.color = "Bleu";
         this.labelSize = 30;
         this.thickness = 8;
